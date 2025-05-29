@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_learning_objectives",
+  "info": {
+    "displayName": "learningObjectives",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "objective": {
+      "type": "string"
+    }
+  }
+}

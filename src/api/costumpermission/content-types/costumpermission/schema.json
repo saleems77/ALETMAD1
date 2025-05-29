@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "costumpermissions",
+  "info": {
+    "singularName": "costumpermission",
+    "pluralName": "costumpermissions",
+    "displayName": "costumpermission"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string",
+      "unique": true
+    },
+    "customusers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::customuser.customuser",
+      "inversedBy": "costumpermissions"
+    }
+  }
+}

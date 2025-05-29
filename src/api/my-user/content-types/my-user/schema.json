@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "my_users",
+  "info": {
+    "singularName": "my-user",
+    "pluralName": "my-users",
+    "displayName": "MyUser"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "username": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "enumeration",
+      "enum": [
+        "google"
+      ]
+    }
+  }
+}

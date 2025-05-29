@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "customusers",
+  "info": {
+    "singularName": "customuser",
+    "pluralName": "customusers",
+    "displayName": "customuser"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email",
+      "unique": true
+    },
+    "password": {
+      "type": "password"
+    },
+    "lastLogin": {
+      "type": "datetime"
+    },
+    "costumrole": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::costumrole.costumrole",
+      "mappedBy": "customuser"
+    },
+    "costumpermissions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::costumpermission.costumpermission",
+      "mappedBy": "customusers"
+    }
+  }
+}

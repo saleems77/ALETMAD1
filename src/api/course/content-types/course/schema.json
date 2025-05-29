@@ -1,0 +1,107 @@
+{
+  "kind": "collectionType",
+  "collectionName": "courses",
+  "info": {
+    "singularName": "course",
+    "pluralName": "courses",
+    "displayName": "course",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "courseName": {
+      "type": "string",
+      "required": true
+    },
+    "requirements": {
+      "type": "text"
+    },
+    "targetAudience": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "isFree": {
+      "type": "boolean",
+      "default": true
+    },
+    "accessInstructions": {
+      "type": "string"
+    },
+    "hasEntryTest": {
+      "type": "boolean"
+    },
+    "track": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::track.track",
+      "inversedBy": "courses"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "courses"
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "entry_test": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::entry-test.entry-test",
+      "mappedBy": "course"
+    },
+    "videos": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.videos"
+    },
+    "learningObjectives": {
+      "type": "text"
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "reviewStatus": {
+      "type": "enumeration",
+      "enum": [
+        "\"Pending\"",
+        "\"Approved\"",
+        "\"Rejected\""
+      ],
+      "default": "\"Pending\""
+    },
+    "rejectionReason": {
+      "type": "string"
+    },
+    "instructorShare": {
+      "type": "decimal",
+      "default": 70
+    },
+    "platformShare": {
+      "type": "decimal",
+      "default": 20
+    },
+    "marketerShare": {
+      "type": "decimal",
+      "default": 10
+    }
+  }
+}

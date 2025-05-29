@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "costumroles",
+  "info": {
+    "singularName": "costumrole",
+    "pluralName": "costumroles",
+    "displayName": "costumrole",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "customuser": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::customuser.customuser",
+      "inversedBy": "costumrole"
+    }
+  }
+}

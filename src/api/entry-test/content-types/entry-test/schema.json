@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "entry_tests",
+  "info": {
+    "singularName": "entry-test",
+    "pluralName": "entry-tests",
+    "displayName": "entryTest\t",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::course.course",
+      "inversedBy": "entry_test"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question.question",
+      "mappedBy": "entry_test"
+    }
+  }
+}

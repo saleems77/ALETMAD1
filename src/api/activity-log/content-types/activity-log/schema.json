@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "activity_logs",
+  "info": {
+    "singularName": "activity-log",
+    "pluralName": "activity-logs",
+    "displayName": "ActivityLog"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "action_type": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "datetime"
+    },
+    "details": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "activity_logs"
+    }
+  }
+}
