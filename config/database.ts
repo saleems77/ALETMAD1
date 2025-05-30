@@ -1,18 +1,10 @@
-// config/database.js
 module.exports = ({ env }) => ({
   connection: {
-    client: 'postgres',
+    client: 'sqlite',
     connection: {
-      connectionString: env('DATABASE_URL'),
-      host: env('DATABASE_HOST'),
-      port: env.int('DATABASE_PORT'),
-      database: env('DATABASE_NAME'),
-      user: env('DATABASE_USERNAME'),
-      password: env('DATABASE_PASSWORD'),
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      filename: env('DATABASE_FILENAME', '.tmp/data.db'),
     },
-    pool: { min: 2, max: 10 },
+    useNullAsDefault: true,
+    acquireConnectionTimeout: 10000 // أضف هذا السطر
   },
 });
