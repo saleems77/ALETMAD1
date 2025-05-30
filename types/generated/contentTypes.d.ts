@@ -34,6 +34,10 @@ export interface AdminApiToken extends Struct.CollectionTypeSchema {
         minLength: 1;
       }> &
       Schema.Attribute.DefaultTo<''>;
+    encryptedKey: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
     expiresAt: Schema.Attribute.DateTime;
     lastUsedAt: Schema.Attribute.DateTime;
     lifespan: Schema.Attribute.BigInteger;
@@ -537,73 +541,6 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiCostumpermissionCostumpermission
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'costumpermissions';
-  info: {
-    displayName: 'costumpermission';
-    pluralName: 'costumpermissions';
-    singularName: 'costumpermission';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    customusers: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::customuser.customuser'
-    >;
-    key: Schema.Attribute.String & Schema.Attribute.Unique;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::costumpermission.costumpermission'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiCostumroleCostumrole extends Struct.CollectionTypeSchema {
-  collectionName: 'costumroles';
-  info: {
-    description: '';
-    displayName: 'costumrole';
-    pluralName: 'costumroles';
-    singularName: 'costumrole';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    customuser: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::customuser.customuser'
-    >;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::costumrole.costumrole'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
   collectionName: 'courses';
   info: {
@@ -660,45 +597,6 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'plugin::users-permissions.user'
     >;
     videos: Schema.Attribute.Component<'shared.videos', true>;
-  };
-}
-
-export interface ApiCustomuserCustomuser extends Struct.CollectionTypeSchema {
-  collectionName: 'customusers';
-  info: {
-    displayName: 'customuser';
-    pluralName: 'customusers';
-    singularName: 'customuser';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    costumpermissions: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::costumpermission.costumpermission'
-    >;
-    costumrole: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::costumrole.costumrole'
-    >;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.Email & Schema.Attribute.Unique;
-    lastLogin: Schema.Attribute.DateTime;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::customuser.customuser'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    password: Schema.Attribute.Password;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
   };
 }
 
@@ -763,38 +661,6 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-  };
-}
-
-export interface ApiMyUserMyUser extends Struct.CollectionTypeSchema {
-  collectionName: 'my_users';
-  info: {
-    displayName: 'MyUser';
-    pluralName: 'my-users';
-    singularName: 'my-user';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.Email;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::my-user.my-user'
-    > &
-      Schema.Attribute.Private;
-    phone: Schema.Attribute.String;
-    provider: Schema.Attribute.Enumeration<['google']>;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    username: Schema.Attribute.String;
-    whatsapp: Schema.Attribute.String;
   };
 }
 
@@ -1391,13 +1257,9 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
-      'api::costumpermission.costumpermission': ApiCostumpermissionCostumpermission;
-      'api::costumrole.costumrole': ApiCostumroleCostumrole;
       'api::course.course': ApiCourseCourse;
-      'api::customuser.customuser': ApiCustomuserCustomuser;
       'api::entry-test.entry-test': ApiEntryTestEntryTest;
       'api::global.global': ApiGlobalGlobal;
-      'api::my-user.my-user': ApiMyUserMyUser;
       'api::question.question': ApiQuestionQuestion;
       'api::track.track': ApiTrackTrack;
       'plugin::content-releases.release': PluginContentReleasesRelease;

@@ -61,11 +61,10 @@ export default {
   }, {});
 
   try {
-    const updatedUser = await strapi.entityService.update(
-      'plugin::users-permissions.user',
-      id,
-      { data: { permissions: formattedPermissions } }
-    );
+    const updatedUser = await strapi.plugins['users-permissions'].services.user.edit(
+  { id },
+  { permissions: formattedPermissions }
+);
     return updatedUser;
   } catch (err) {
     ctx.throw(500, err);
