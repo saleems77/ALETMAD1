@@ -20,7 +20,6 @@
     "@strapi/plugin-users-permissions": "5.14.0",
     "@strapi/provider-upload-local": "5.14.0",
     "@strapi/strapi": "5.14.0",
-    "@strapi/provider-database-sqlite": "^5.14.0",
     "better-sqlite3": "^11.10.0",
     "fs-extra": "10.0.0",
     "pg": "^8.11.0",
