@@ -6,6 +6,6 @@ export default ({ env }) => ({
   },
   cors: {
     enabled: true,
-    origin: ['http://localhost:3000'], // إضافة عنوان Next.js هنا
+    origin: ['https://arab-platt-form.vercel.app'], // إضافة عنوان Next.js هنا
   },
 });
