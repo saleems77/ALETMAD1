@@ -1,0 +1,265 @@
+{
+    "header": {
+      "explore": "Explore Courses",
+      "search": "Search thousands of courses...",
+      "cart": "Shopping Cart",
+      "profile": "Profile",
+      "language": "العربية"
+    },
+    "welcome": {
+      "title": "Welcome back,",
+      "subtitle": "You have 3 new lessons waiting today! 🚀",
+      "userName": "Mohammed Nour"
+    },
+    "slides": {
+      "newTag": "New Today",
+      "0": {
+        "title": "Community Powered",
+        "description": "Discover top tools and resources through our active learning community",
+        "cta": "Explore Resources"
+      },
+      "1": {
+        "title": "Start Learning Now",
+        "description": "Interactive lessons and premium content for all skill levels",
+        "cta": "Browse Lessons"
+      }
+    },
+    "featuresTitle": "Platform Features",
+    "features": {
+      "0": {
+        "title": "Interactive Community",
+        "description": "Connect with learners and share experiences"
+      },
+      "1": {
+        "title": "Practical Exercises",
+        "description": "Practice with real projects and instant feedback"
+      },
+      "2": {
+        "title": "Progress Tracking",
+        "description": "Get detailed progress reports and analytics"
+      },
+      "3": {
+        "title": "Full Customization",
+        "description": "Customize your learning path to your needs"
+      }
+    },
+    "buttons": {
+      "getStarted": "Get Started"
+    },
+    "altTexts": {
+      "user": "User profile image"
+    },
+    "courses": {
+    "searchPlaceholder": "Search for courses or instructors...",
+    "filters": "Filters",
+    "categoryLabel": "Category",
+    "allCategories": "All Categories",
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "popularity": "Popularity",
+      "price": "Price",
+      "rating": "Rating"
+    },
+    "results": "Results",
+    "courses": "courses",
+    "students": "students",
+    "duration": "Duration",
+    "hours": "hours",
+    "hoursShort": "h",
+    "lessons": "Lessons",
+    "level": "Level",
+    "buyNow": "Buy Now",
+    "noResults": "No courses found",
+    "resetFilters": "Reset Filters",
+    "courseDetails": "Course Details",
+    "defaultDescription": "Detailed course description including objectives, skills to be learned, prerequisites and additional important information.",
+    "subscribeNow": "Subscribe Now",
+    "discount": "Discount"
+  },
+  "learningGoals": {
+    "title": {
+      "line1": "Learning Focused on",
+      "line2": "Your Goals"
+    },
+    "subtitle": "Choose your learning path aligned with your career ambitions",
+    "cards": [
+      {
+        "title": "Practical Training",
+        "description": "Develop your skills effectively with interactive programming exercises"
+      },
+      {
+        "title": "Certification Preparation",
+        "description": "Prepare for globally recognized certifications with mock tests"
+      },
+      {
+        "title": "Insights & Analytics",
+        "description": "Track progress with interactive dashboards"
+      },
+      {
+        "title": "Custom Content",
+        "description": "Design your learning path based on goals"
+      }
+    ],
+    "content": {
+      "containerization": "Containerization",
+      "new": "New",
+      "monthlyProgress": "Monthly Progress",
+      "highestScore": "Highest Score",
+      "percentage": "Percentage",
+      "certPath": "Professional Certification Path",
+      "completion": "Content Completion",
+      "remainingTests": "Remaining Tests",
+      "attempts": "Available Attempts"
+    }
+  },
+  "pricing": {
+    "title": "Premium Pricing Plans",
+    "subtitle": "Choose the plan that fits your ambitions and empowers your team to achieve exceptional results",
+    "featuresTitle": "Key Features",
+    "guarantee": "All plans include a 30-day money-back guarantee",
+    "plans": [
+      {
+        "title": "Personal Plan",
+        "subtitle": "For ambitious individuals",
+        "price": "Starting from €15.00",
+        "period": "monthly",
+        "button": "Start Free Trial",
+        "features": [
+          "Full access to 12,000+ courses",
+          "Internationally recognized certifications",
+          "AI-powered recommendations",
+          "Interactive coding exercises",
+          "24/7 technical support"
+        ]
+      },
+      {
+        "title": "Team Plan",
+        "subtitle": "For innovative teams",
+        "price": "€28.00",
+        "period": "per member/month",
+        "button": "Try Team Free Trial",
+        "badgeText": "Most Popular",
+        "features": [
+          "All Personal Plan features",
+          "Central team management",
+          "Detailed performance reports",
+          "Custom group training",
+          "Collaborative team platform",
+          "Discounts for large teams"
+        ]
+      },
+      {
+        "title": "Enterprise Plan",
+        "subtitle": "For large corporations",
+        "price": "Comprehensive Solutions",
+        "period": "Custom plans",
+        "button": "Request Custom Quote",
+        "badgeText": "Advanced Solutions",
+        "features": [
+          "Unlimited access to 27,000+ courses",
+          "Custom learning platform",
+          "Advanced analytics & statistics",
+          "Enterprise system integration",
+          "VIP priority support",
+          "Live expert training sessions",
+          "Automated employee assessments",
+          "Weekly updates"
+        ]
+      }
+    ]
+  },
+  "testimonials": {
+    "see": "See",
+    "title": " what others achieve through learning",
+    "items": [
+      {
+        "quote": "Most training courses on Udemy and certification programs are popular for learning how to program according to 2023 StackOverflow developer surveys.",
+        "author": "37,076 responses collected",
+        "logoSrc": "https://cvstation.sa/images/blogs/ahm-almharat-alothyfy-almtlob-llngah-fy-ay-aaml-dc9a60ea-99ac-4aab-8911-b039f2a41146.png",
+        "logoAlt": "stackoverflow",
+        "linkText": "View Web Development Courses",
+        "linkHref": "#"
+      },
+      {
+        "quote": "Udemy has been an amazing guide for me while learning 3D design.",
+        "author": "Technical Co-Founder & CTO at Dimensional",
+        "logoSrc": "/images/author2.jpg",
+        "logoAlt": "Alvin Lim",
+        "linkText": "View iOS & Swift Course",
+        "linkHref": "#"
+      },
+      {
+        "quote": "Gave me the ability to scale. Learned exactly what I needed for real life. Helped me prove my worth for a new job.",
+        "author": "Partner Account Manager at AWS",
+        "logoSrc": "/images/author3.jpg",
+        "logoAlt": "William A. Washington",
+        "linkText": "View AWS Course",
+        "linkHref": "#"
+      },
+      {
+        "quote": "Business employees combined technical and consulting skills to advance their careers.",
+        "author": "Head of Capability Development, North America at Publicis Sapient",
+        "logoSrc": "/images/author4.jpg",
+        "logoAlt": "Ian Stevens",
+        "linkText": "Read Full Story",
+        "linkHref": "#"
+      }
+    ]
+  },
+  "report": {
+    "title": "Key Trends for the Future of Work",
+    "subtitle": "2025 Report",
+    "description": "Our global learning and skills trends report for 2025 is now released. Discover how to build skills to keep pace with change.",
+    "button": "Get the Report",
+    "imageAlt": "Report preview"
+  },
+  "popular": {
+    "title": "Trending Now",
+    "highlight": {
+      "title": "ChatGPT is an amazing skill",
+      "linkText": "View ChatGPT Courses",
+      "learners": "4,408,320 learners"
+    },
+    "categories": [
+      {
+        "title": "Business",
+        "icon": "chart",
+        "items": [
+          { "text": "PMP Certification", "learners": "2,588,082 learners", "trending": true },
+          { "text": "Microsoft Power BI", "learners": "4,674,377 learners", "new": true },
+          { "text": "Project Management", "learners": "4,009,801 learners" }
+        ]
+      },
+      {
+        "title": "Design",
+        "icon": "book",
+        "items": [
+          { "text": "Blender", "learners": "2,925,380 learners" },
+          { "text": "Graphic Design", "learners": "4,507,425 learners" },
+          { "text": "UX Design", "learners": "2,075,677 learners" }
+        ]
+      },
+      {
+        "title": "Development",
+        "icon": "rocket",
+        "items": [
+          { "text": "Python", "learners": "47,975,610 learners" },
+          { "text": "Web Development", "learners": "14,047,591 learners" },
+          { "text": "Data Science", "learners": "7,820,933 learners" }
+        ]
+      }
+    ],
+    "trendingTag": "Trending",
+    "newTag": "New"
+  },
+  "caseStudy": {
+    "company": "Booz | Allen | Hamilton",
+    "heading": "Unlocking talent retention and productivity through upskilling",
+    "stats": [
+      { "value": "93%", "label": "Retention rate among participating employees" },
+      { "value": "65%", "label": "Noticed positive impact on productivity" }
+    ],
+    "imageAlt": "Case Study Preview",
+    "linkText": "Read Full Story"
+  }
+  }

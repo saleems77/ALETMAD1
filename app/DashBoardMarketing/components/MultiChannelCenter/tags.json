@@ -1,0 +1,5 @@
+[
+    {"value": "vip", "label": "عملاء VIP"},
+    {"value": "active", "label": "نشط"},
+    {"value": "inactive", "label": "غير نشط"}
+  ]

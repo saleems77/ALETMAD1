@@ -1,0 +1,21 @@
+{
+    "stats": {
+      "totalUsers": 2456,
+      "activeUsers": 1893,
+      "totalCourses": 142,
+      "totalRevenue": 45200,
+      "engagementRate": 68,
+      "completionRate": 75
+    },
+    "charts": {
+      "monthlyGrowth": [
+        {"month": "يناير", "users": 1200, "courses": 45, "revenue": 12000},
+        {"month": "فبراير", "users": 1800, "courses": 67, "revenue": 18500}
+      ],
+      "revenueSources": [
+        {"source": "الاشتراكات", "amount": 25000},
+        {"source": "الدورات", "amount": 15000},
+        {"source": "الإعلانات", "amount": 5200}
+      ]
+    }
+  }

@@ -1,0 +1,51 @@
+{
+    "socialPlatforms": [
+      {
+        "id": 1,
+        "name": "Facebook",
+        "icon": "/icons/facebook.svg",
+        "pages": [
+          {
+            "id": "page_1",
+            "name": "الصفحة الرسمية",
+            "followers": 15000,
+            "accessToken": "FB_TOKEN_123"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Instagram",
+        "icon": "/icons/instagram.svg",
+        "pages": [
+          {
+            "id": "profile_1",
+            "name": "الحساب الرئيسي",
+            "followers": 23000,
+            "accessToken": "IG_TOKEN_456"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "TikTok",
+        "icon": "/icons/tiktok.svg",
+        "username": "@marketing_ar",
+        "followers": 50000
+      }
+    ],
+    "scheduledPosts": [
+      {
+        "id": "post_1",
+        "content": "🎉 عرض خاص لمدة 24 ساعة فقط!",
+        "platforms": ["facebook", "instagram"],
+        "scheduledTime": "2025-04-25T18:00:00",
+        "status": "مجدول",
+        "engagement": {
+          "likes": 0,
+          "comments": 0,
+          "shares": 0
+        }
+      }
+    ]
+  }

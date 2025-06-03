@@ -1,0 +1,34 @@
+{
+  "transactions": [
+    {
+      "id": 1,
+      "date": "2024-03-01",
+      "type": "إيراد",
+      "amount": 15000,
+      "currency": "ر.س",
+      "category": "الاشتراكات",
+      "status": "مكتمل",
+      "description": "اشتراك سنوي للمتدرب أحمد"
+    },
+    {
+      "id": 2,
+      "date": "2024-03-05",
+      "type": "مصروف",
+      "amount": 5000,
+      "currency": "ر.س",
+      "category": "التسويق",
+      "status": "مكتمل",
+      "description": "حملة إعلانية على وسائل التواصل"
+    },
+    {
+      "id": 3,
+      "date": "2024-03-10",
+      "type": "إيراد",
+      "amount": 8000,
+      "currency": "ر.س",
+      "category": "العمولات",
+      "status": "معلق",
+      "description": "عمولة دورة تدريبية"
+    }
+  ]
+}

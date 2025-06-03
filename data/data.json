@@ -1,0 +1,24 @@
+{
+    "categories": [
+      {
+        "categoryName": "التصميم",
+        "icon": "🎨",
+        "courses": [
+          {
+            "id": "1",
+            "name": "دورة Figma المتقدمة",
+            "description": "...",
+            "price": 99,
+            "discount": 20,
+            "duration": "15 ساعة",
+            "level": "متوسط",
+            "image": "/course1.jpg",
+            "instructor": "أحمد محمد",
+            "studentsEnrolled": 1500,
+            "rating": 4.8,
+            "certificate": true
+          }
+        ]
+      }
+    ]
+  }

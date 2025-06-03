@@ -1,0 +1,16 @@
+{
+  "reports": [
+    {
+      "id": "R003",
+      "title": "تقرير التدريب السنوي",
+      "date": "2025-01-01",
+      "type": "yearly",
+      "role": "trainer",
+      "data": {
+        "coursesCompleted": 50,
+        "trainees": 200,
+        "successRate": "85%"
+      }
+    }
+  ]
+}

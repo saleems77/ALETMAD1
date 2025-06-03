@@ -1,0 +1,16 @@
+{
+  "users": [
+    {"id": 1, "name": "أحمد محمد", "email": "ahmed@example.com", "role": "مدرب", "status": "نشط"},
+    {"id": 2, "name": "فاطمة علي", "email": "fatima@example.com", "role": "متدرب", "status": "نشط"}
+  ],
+  "stats": {
+    "totalUsers": 150,
+    "activeUsers": 135,
+    "trainers": 15,
+    "trainees": 120
+  },
+  "activityLogs": [
+    {"id": 1, "date": "2024-03-15", "action": "تسجيل دخول", "user": "أحمد محمد"},
+    {"id": 2, "date": "2024-03-15", "action": "إنشاء دورة", "user": "فاطمة علي"}
+  ]
+}

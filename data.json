@@ -1,0 +1,408 @@
+{
+  "categories": [
+    {
+      "categoryName": "تطوير الويب",
+      "icon": "💻",
+      "courses": [
+        {
+          "id": 1,
+          "name": "Next.js الاحترافي - الإصدار 14",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWPE22E4GN3ctPStJrzFgHmtvu6S87f2M3mg&s",
+          "price": 249.99,
+          "discount": 15,
+          "description": "احترف تطوير تطبيقات الإنتاج باستخدام أحدث إصدارات Next.js مع دعم SSR و ISR",
+          "instructor": "علي حسن",
+          "rating": 4.9,
+          "duration": "28 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 4821,
+          "language": "العربية",
+          "lessons": 156,
+          "projects": 12,
+          "certificate": true,
+          "isFavorite": false,
+          "prerequisites": ["JavaScript", "React الأساسيات"]
+        },
+        {
+          "id": 2,
+          "name": "React مع Redux Toolkit",
+          "image": "https://media2.dev.to/dynamic/image/width=1080,height=1080,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F56o7zzuzxcgst6lex0hn.png",
+          "price": 179.99,
+          "discount": 10,
+          "description": "إدارة الحالة المتقدمة في تطبيقات React الكبيرة مع TypeScript دعم",
+          "instructor": "سارة عبدالرحمن",
+          "rating": 4.8,
+          "duration": "18 ساعة",
+          "level": "متوسط",
+          "studentsEnrolled": 3275,
+          "language": "الإنجليزية",
+          "lessons": 92,
+          "isFavorite": false,
+          "projects": 8,
+          "certificate": true
+        },
+        {
+          "id": 3,
+          "name": "Full Stack مع MERN",
+          "image": "https://itsagar.com/assets/v3/images/page/full-stack-mern.webp",
+          "price": 399.99,
+          "discount": 20,
+          "description": "تطوير تطبيقات كاملة من الصفر إلى النشر مع MongoDB و Express.js",
+          "instructor": "محمد الخالد",
+          "rating": 4.95,
+          "duration": "35 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 2154,
+          "language": "العربية",
+          "lessons": 210,
+          "projects": 15,
+          "isFavorite": false,
+
+          "certificate": true
+        },
+        {
+          "id": 4,
+          "name": "أساسيات JavaScript ES6+",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQihnA-xTUZJP7GiWMexj_ywam-NuSvVwuuOw&s",
+          "price": 89.99,
+          "description": "مرجع شامل للجافاسكريبت الحديثة مع تمارين تفاعلية",
+          "instructor": "نورة الفهد",
+          "rating": 4.7,
+          "duration": "12 ساعة",
+          "level": "مبتدئ",
+          "studentsEnrolled": 8743,
+          "language": "العربية",
+          "isFavorite": false,
+"discount": 20,
+          "lessons": 64,
+          "certificate": true
+        },
+        {
+          "id": 5,
+          "name": "Node.js و Express.js",
+          "image": "https://img-c.udemycdn.com/course/750x422/1672410_9ff1_5.jpg",
+          "price": 199.99,
+          "description": "بناء APIs احترافية باستخدام Node.js مع اختبارات Postman",
+          "instructor": "خالد السعدي",
+          "rating": 4.85,
+          "duration": "22 ساعة",
+          "level": "متوسط",
+          "studentsEnrolled": 5321,
+          "language": "العربية",
+          "lessons": 120,
+          "isFavorite": false,
+"discount": 20,
+          "projects": 7,
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "التصميم الجرافيكي",
+      "icon": "🎨",
+      "courses": [
+        {
+          "id": 6,
+          "name": "احتراف Adobe Photoshop",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsSQ5YKU24vjx-1pfgiYfrVOSh6-shadiuUA&s",
+          "price": 149.99,
+          "discount": 5,
+          "description": "تقنيات متقدمة في التصميم الرقمي والتصوير الفوتوغرافي",
+          "instructor": "ليان أحمد",
+          "rating": 4.88,
+          "duration": "25 ساعة",
+          "level": "متوسط",
+          "studentsEnrolled": 2876,
+          "language": "العربية",
+          "lessons": 85,
+          "isFavorite": false,
+
+          "projects": 10
+          
+        },
+        {
+          "id": 7,
+          "name": "تصميم الشعارات الاحترافي",
+          "image": "https://example.com/logo-design.jpg",
+          "price": 99.99,
+          "description": "أسرار تصميم الهويات البصرية الناجحة مع دراسات حالة عملية",
+          "instructor": "يوسف ناصر",
+          "rating": 4.75,
+          "duration": "15 ساعة",
+          "level": "مبتدئ",
+          "studentsEnrolled": 4123,
+          "isFavorite": false,
+"discount": 20,
+          "language": "العربية",
+          "certificate": true
+        },
+        {
+          "id": 8,
+          "name": "UI/UX مع Figma",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWPE22E4GN3ctPStJrzFgHmtvu6S87f2M3mg&s",
+          "price": 179.99,
+          "description": "تصميم واجهات مستخدم تفاعلية مع أنظمة Design Systems",
+          "instructor": "ريم العتيبي",
+          "rating": 4.92,
+          "duration": "20 ساعة",
+          "level": "متوسط",
+          "studentsEnrolled": 6543,
+          "language": "الإنجليزية",
+          "isFavorite": false,
+"discount": 20,
+          "projects": 6
+        }
+      ]
+    },
+    {
+      "categoryName": "التسويق الرقمي",
+      "icon": "📈",
+      "courses": [
+        {
+          "id": 9,
+          "name": "إستراتيجيات السيو المتقدمة",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu21sODZIo4_xErW6S5Huh96vP11OHvrPRpQ&s",
+          "price": 299.99,
+          "description": "تصدر نتائج البحث مع أدوات SEMrush و Ahrefs العملية",
+          "instructor": "فهد الجاسم",
+          "rating": 4.83,
+          "isFavorite": false,
+"discount": 20,
+          "duration": "30 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 1987,
+          "language": "العربية",
+          "caseStudies": 12
+        },
+        {
+          "id": 10,
+          "name": "إعلانات فيسبوك الاحترافية",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWPE22E4GN3ctPStJrzFgHmtvu6S87f2M3mg&s",
+          "price": 199.99,
+          "discount": 15,
+          "description": "تحسين الحملات الإعلانية باستخدام Pixel وتحليلات Meta",
+          "instructor": "أميرة محمد",
+          "rating": 4.79,
+          "duration": "18 ساعة",
+          "level": "متوسط",
+          "isFavorite": false,
+
+          "studentsEnrolled": 3456,
+          "language": "العربية"
+        }
+      ]
+    },
+    {
+      "categoryName": "التنمية الذاتية",
+      "icon": "💪",
+      "courses": [
+        {
+          "id": 25,
+          "name": "فن الإلقاء والتحدث أمام الجمهور",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrV6s3JRQIjHN2yll0zMbosbqTyuzTTxUHZg&s",
+          "price": 129.99,
+          "description": "تقنيات التحكم بالقلق وبناء الثقة في العروض التقديمية",
+          "instructor": "إيمان السديري",
+          "rating": 4.85,
+          "duration": "8 ساعات",
+          "level": "مبتدئ",
+          "isFavorite": false,
+"discount": 20,
+          "studentsEnrolled": 4321,
+          "language": "العربية",
+          "videoExamples": 15
+        },
+        {
+          "id": 26,
+          "name": "إدارة الوقت الفعالة",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrV6s3JRQIjHN2yll0zMbosbqTyuzTTxUHZg&s",
+          "price": 89.99,
+          "description": "تطبيق منهجية GTD وأدوات إنتاجية حديثة",
+          "instructor": "خالد الحميدي",
+          "rating": 4.78,
+          "duration": "6 ساعات",
+          "isFavorite": false,
+"discount": 20,
+          "level": "مبتدئ",
+          "studentsEnrolled": 5678
+        }
+      ]
+    },
+    {
+      "categoryName": "الذكاء الاصطناعي",
+      "icon": "🤖",
+      "courses": [
+        {
+          "id": 35,
+          "name": "مقدمة في تعلم الآلة",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTB0wrwn4-D2fha1UYTtG_G-28imbF9RkpHWA&s",
+          "price": 449.99,
+          "description": "بناء نماذج تنبؤية باستخدام Python و Scikit-learn",
+          "instructor": "د. عمر الفاروق",
+          "rating": 4.93,
+          "isFavorite": false,
+"discount": 20,
+          "duration": "40 ساعة",
+          "level": "متقدم",
+          "prerequisites": ["Python", "الإحصاء الأساسي"]
+        },
+        {
+          "id": 36,
+          "name": "معالجة اللغة الطبيعية (NLP)",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrV6s3JRQIjHN2yll0zMbosbqTyuzTTxUHZg&s",
+          "price": 499.99,
+          "description": "تقنيات تحليل النصوص مع TensorFlow و PyTorch",
+          "instructor": "أسماء الخليفي",
+          "rating": 4.88,
+          "isFavorite": false,
+"discount": 20,
+          "duration": "35 ساعة"
+        }
+      ]
+    },
+
+    {
+      "categoryName": "الطب الطارئ والعناية المركزة",
+      "icon": "🚑",
+      "courses": [
+        {
+          "id": 37,
+          "name": "أساسيات الطب الطارئ",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5pyRi9wtQ35FErz4ekMdEdS1z5RyntCCvGw&s",
+          "price": 499.99,
+          "discount": 25,
+          "description": "إدارة الحالات الحرجة في غرفة الطوارئ مع تدريب عملي على الإنعاش القلبي الرئوي",
+          "instructor": "د. عبدالله الطبي",
+          "rating": 4.91,
+          "duration": "45 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 1245,
+          "language": "العربية",
+          "prerequisites": ["شهادة أساسيات الإسعافات"],
+          "certificate": true
+        },
+        {
+          "id": 38,
+          "name": "إدارة التنفس الاصطناعي",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTit6IKOqVc6O2pds9hsVFN8d_tXGYZBooQfw&s",
+          "price": 649.99,
+          "description": "بروتوكولات استخدام أجهزة التنفس الاصطناعي في العناية المركزة",
+          "instructor": "د. سلمان العيسى",
+          "rating": 4.87,
+          "duration": "32 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 876,
+          "discount": 20,
+          "language": "العربية",
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "الموجات الفوق صوتية التشخيصية",
+      "icon": "🌊",
+      "courses": [
+        {
+          "id": 39,
+          "name": "الموجات فوق الصوتية في الطوارئ",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVsEMfpG9NON57TiroI08I6DA5l5ZY48cFbA&s",
+          "price": 599.99,
+          "discount": 10,
+          "description": "تشخيص الحالات الحرجة باستخدام جهاز الموجات فوق الصوتية المحمول",
+          "instructor": "د. مريم العلي",
+          "rating": 4.89,
+          "duration": "28 ساعة",
+          "level": "متوسط",
+          "studentsEnrolled": 945,
+          "language": "العربية",
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "الصيدلة الإكلينيكية",
+      "icon": "💊",
+      "courses": [
+        {
+          "id": 40,
+          "name": "الصيدلة في العناية المركزة",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSksn2WtxSmrF_V_4cuMKkUMoanTtED-jl0Dg&s",
+          "price": 399.99,
+          "description": "جرعات الأدوية وتفاعلاتها في وحدات العناية المركزة",
+          "instructor": "أ. سارة الصيدلاني",
+          "rating": 4.78,
+          "duration": "20 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 1123,
+          "language": "العربية",
+          "discount": 20,
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "التمريض المتخصص",
+      "icon": "🩺",
+      "courses": [
+        {
+          "id": 41,
+          "name": "تمريض العناية المركزة",
+          "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sms9r2N89QdyuD9_SmSAFUu-CJP0IlI2Fw&s",
+          "price": 449.99,
+          "description": "مراقبة المرضى المنومين في العناية المركزة وتوثيق العلامات الحيوية",
+          "instructor": "أ. خالد التميمي",
+          "rating": 4.85,
+          "duration": "35 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 1567,
+          "language": "العربية",
+          "discount": 20,
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "الطب الباطني",
+      "icon": "🩺",
+      "courses": [
+        {
+          "id": 42,
+          "name": "تشخيص الأمراض الباطنية",
+          "image": "https://studyinegy.com/wp-content/uploads/2022/12/Internal-diseases.webp",
+          "price": 549.99,
+          "discount": 15,
+          "description": "تحليل الفحوصات المخبرية والشعاعية للأمراض المزمنة",
+          "instructor": "د. فاطمة الزهراء",
+          "rating": 4.92,
+          "duration": "40 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 2134,
+          "language": "العربية",
+          "certificate": true
+        }
+      ]
+    },
+    {
+      "categoryName": "الطب النفسي",
+      "icon": "🧠",
+      "courses": [
+        {
+          "id": 43,
+          "name": "إدارة الحالات النفسية الطارئة",
+          "image": "https://dawratalrafah.com/wp-content/uploads/2023/02/pyschotheraphy-tumb-1.png",
+          "price": 399.99,
+          "description": "التقييم السريع لاضطرابات الهوس والاكتئاب الحاد في الطوارئ",
+          "instructor": "د. أحمد النفسي",
+          "rating": 4.81,
+          "duration": "25 ساعة",
+          "level": "متقدم",
+          "studentsEnrolled": 987,
+          "language": "العربية",
+          "discount": 20,
+          "certificate": true
+        }
+      ]
+    }
+    
+  ]
+}
