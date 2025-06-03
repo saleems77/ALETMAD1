@@ -4,8 +4,11 @@ export default ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
+  proxy: true,
+  url: env('PUBLIC_ADMIN_URL', 'https://sublime-dinosaurs-4dd432ee51.strapiapp.com'),
+  
   cors: {
     enabled: true,
-    origin: ['https://arab-platt-form.vercel.app'], // إضافة عنوان Next.js هنا
+    origin: ['https://copy-platt-form.vercel.app'], // إضافة عنوان Next.js هنا
   },
 });
