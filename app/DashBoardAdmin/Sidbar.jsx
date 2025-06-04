@@ -35,6 +35,7 @@ const categories = [
     title: 'إدارة المستخدمين',
     icon: faUsers,
     items: [
+            { key: 'Employee', label: 'ادارة مستخدمي المنصة', icon: faUsers },
       { key: 'addstudent', label: 'إضافة متدرب جديد', icon: faPlusCircle },
       { key: 'tracker', label: 'تفاعل المستخدمين', icon: faChartLine }
     ]

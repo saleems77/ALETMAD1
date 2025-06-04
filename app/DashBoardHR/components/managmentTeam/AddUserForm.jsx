@@ -87,7 +87,7 @@ const AddUserForm = ({ onSubmit }) => {
 
       <button
         type="submit"
-        className="mt-4 bg-blue-500 text-white px-6 py-2 rounded flex items-center gap-2 hover:bg-blue-600"
+        className="mt-4 bg-blue-500 text-black px-6 py-2 rounded flex items-center gap-2 hover:bg-blue-600"
       >
         <CheckIcon className="w-5 h-5" />
         إضافة مستخدم

@@ -38,6 +38,7 @@ import TicketsManager from './components/Support/TicketsManager';
 import TasksManager from './components/Support/TasksManager';
 import InternalCommunication from './components/voip/InternalCommunication';
 import VoipDashboard from './components/voip/page';
+import UsersPage from '../DashBoardHR/components/managmentTeam/page';
 
 const AdminDashboard = () => {
   // State management
@@ -236,6 +237,8 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+                {activeSection === 'Employee' && <UsersPage />}
+          
                 {activeSection === 'addstudent' && <InviteLinkGenerator />}
                 {activeSection === 'tracker' && <CourseManagementy  />}
                 {activeSection === 'tracker' && <ReviewStats  />}

@@ -203,10 +203,10 @@ const handleAddMember = async () => {
         <button
           onClick={handleAddMember}
           disabled={isAdding}
-          className="mt-4 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 justify-center transition-colors bg-blue-500 text-white disabled:bg-gray-400"
+          className="mt-4 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 justify-center transition-colors bg-blue-500 text-black disabled:bg-blue-500"
         >
           {isAdding ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
           ) : (
             <PlusIcon className="w-5 h-5" />
           )}
