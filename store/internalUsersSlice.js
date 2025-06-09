@@ -64,14 +64,22 @@ export const addInternalUser = createAsyncThunk(
   }
 );
 
+// internalUsersSlice.js
 export const updateInternalUser = createAsyncThunk(
   "internalUsers/update",
   async ({ id, updates }, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
+
+      // إضافة معرف الدور إذا كان موجوداً
+      const dataToSend = {
+        ...updates,
+        role: updates.role || null, // إرسال null إذا لم يكن هناك دور
+      };
+
       const response = await axios.put(
         `${API_URL}/internal-users/${id}`,
-        { data: updates },
+        { data: dataToSend },
         {
           headers: {
             Authorization: `Bearer ${auth.token}`,
@@ -79,6 +87,7 @@ export const updateInternalUser = createAsyncThunk(
           },
         }
       );
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

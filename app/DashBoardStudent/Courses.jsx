@@ -71,7 +71,7 @@ const CourseCard = ({
       <div className="relative h-48 overflow-hidden rounded-t-xl">
         {course.coverImage ? (
           <Image
-            src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${course.coverImage?.url}`}
+            src={`${course.coverImage?.url}`}
             alt={course.courseName}
             width={400}
             height={300}

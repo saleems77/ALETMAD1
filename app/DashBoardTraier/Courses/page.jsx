@@ -97,7 +97,7 @@ const coverImage = course.coverImage;
               <div className="relative h-48 w-full mb-4 rounded-lg overflow-hidden">
   {coverImage ? (
    <Image
-  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${coverImage?.url}`}
+  src={ `${coverImage?.url}`}
   alt={course.courseName}
   width={400}
   height={300}

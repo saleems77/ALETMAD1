@@ -1,3 +1,4 @@
+// MemberDetailsModal.jsx
 'use client';
 import { useEffect, useState } from 'react';
 import ActivityLogs from './ActivityLogs';
@@ -7,20 +8,48 @@ import {
   UserCircleIcon,
   EnvelopeIcon,
   PhoneIcon,
-  XMarkIcon
+  XMarkIcon,
+  ShieldCheckIcon,
+  KeyIcon
 } from '@heroicons/react/24/solid';
 import { Tab } from '@headlessui/react';
 import LoadingSpinner from './LoadingSpinner';
 import EmptyState from './EmptyState';
 
-// تعريف الثيم اللوني
 const theme = {
   blue: '#008DCB',
-  black: '#000000',
+  black: '#0D1012',
   gray: '#999999',
   red: '#E2101E',
   white: '#FFFFFF',
   yellow: '#F9D011'
+};
+
+// نفس قاموس الترجمة المستخدم في المكونات الأخرى
+const PERMISSION_TRANSLATIONS = {
+  'create_user': 'إنشاء مستخدمين',
+  'edit_user': 'تعديل المستخدمين',
+  'delete_user': 'حذف المستخدمين',
+  'view_users': 'عرض المستخدمين',
+  'create_course': 'إنشاء دورات',
+  'edit_course': 'تعديل الدورات',
+  'delete_course': 'حذف الدورات',
+  'publish_course': 'نشر الدورات',
+  'enroll_students': 'تسجيل الطلاب',
+  'manage_grades': 'إدارة الدرجات',
+  'view_progress': 'متابعة التقدم',
+  'view_payments': 'عرض المدفوعات',
+  'manage_invoices': 'إدارة الفواتير',
+  'financial_reports': 'التقارير المالية',
+  'create_campaigns': 'إنشاء حملات',
+  'manage_promotions': 'إدارة العروض',
+  'analytics_view': 'تحليل الأداء',
+  'manage_employees': 'إدارة الموظفين',
+  'manage_attendance': 'إدارة الحضور',
+  'payroll_management': 'إدارة الرواتب',
+  'system_settings': 'إعدادات النظام',
+  'manage_roles': 'إدارة الأدوار',
+  'backup_restore': 'النسخ الاحتياطي'
 };
 
 export default function MemberDetailsModal({ member, onClose, activityLogs, isLoading }) {
@@ -37,14 +66,27 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
   }, [onClose]);
 
   const tabs = [
-    { name: 'النشاطات', count: activityLogs.length },
-    { name: 'المعلومات الشخصية', count: null },
+    { name: 'النشاطات', count: activityLogs.length, icon: ClockIcon },
+    { name: 'المعلومات', count: null, icon: UserCircleIcon },
+    { name: 'الصلاحيات', count: member.permissions?.length || 0, icon: ShieldCheckIcon }
   ];
+
+  // تحويل كائن الصلاحيات إلى مصفوفة
+  const permissionsArray = member.permissions && typeof member.permissions === 'object' 
+    ? Object.entries(member.permissions)
+        .filter(([_, value]) => value === true)
+        .map(([key]) => key)
+    : member.permissions || [];
+
+  // ترجمة الصلاحيات إلى عربية
+  const translatedPermissions = permissionsArray.map(perm => 
+    PERMISSION_TRANSLATIONS[perm] || perm
+  );
 
   return (
     <div className="fixed inset-0 bg-[rgba(13,16,18,0.8)] backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div 
-        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden"
         style={{ backgroundColor: theme.white }}
         role="dialog"
         aria-labelledby="modal-title"
@@ -53,14 +95,22 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
         <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: theme.gray + '40' }}>
           <div>
             <h2 id="modal-title" className="text-2xl font-bold" style={{ color: theme.black }}>
-              {member.name}
+              {member.username}
             </h2>
-            <p className="text-sm mt-1" style={{ color: theme.gray }}>
-              <span className="inline-flex items-center gap-1">
-                <UserCircleIcon className="w-4 h-4" style={{ color: theme.blue }} />
-                {member.position}
+            <div className="flex items-center gap-2 mt-1">
+              <span 
+                className="px-2 py-1 rounded-full text-xs font-medium"
+                style={{ 
+                  backgroundColor: theme.blue + '20',
+                  color: theme.blue
+                }}
+              >
+                {member.role?.name || 'بدون دور'}
               </span>
-            </p>
+              <span className="text-sm" style={{ color: theme.gray }}>
+                {member.email}
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -74,12 +124,12 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
 
         {/* Tabs Navigation */}
         <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
-          <Tab.List className="flex border-b px-6" style={{ borderColor: theme.gray + '40' }}>
+          <Tab.List className="flex border-b" style={{ borderColor: theme.gray + '40' }}>
             {tabs.map((tab, idx) => (
               <Tab
                 key={idx}
                 className={({ selected }) => `
-                  px-4 py-3 text-sm font-medium relative flex items-center
+                  px-4 py-3 text-sm font-medium relative flex items-center gap-2
                   ${selected 
                     ? 'border-b-2' 
                     : 'hover:opacity-80'}
@@ -89,6 +139,7 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                   borderColor: selectedTab === idx ? theme.blue : 'transparent'
                 }}
               >
+                <tab.icon className="w-4 h-4" />
                 {tab.name}
                 {tab.count !== null && (
                   <span 
@@ -107,7 +158,7 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
         </Tab.Group>
 
         {/* Content Section */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           {isLoading ? (
             <div className="py-12 flex justify-center">
               <LoadingSpinner 
@@ -117,8 +168,9 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
               />
             </div>
           ) : (
-            <>
-              {selectedTab === 0 && (
+            <Tab.Panels className="flex-1">
+              {/* Activity Tab */}
+              <Tab.Panel className="p-6">
                 <ActivityLogs 
                   logs={activityLogs} 
                   emptyState={
@@ -136,9 +188,11 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                     borderColor: theme.gray + '40'
                   }}
                 />
-              )}
-              {selectedTab === 1 && (
-                <div className="space-y-6">
+              </Tab.Panel>
+              
+              {/* Information Tab */}
+              <Tab.Panel className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* معلومات الاتصال */}
                   <div 
                     className="p-5 rounded-xl border"
@@ -148,18 +202,18 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                     }}
                   >
                     <h3 
-                      className="text-lg font-semibold mb-4"
+                      className="text-lg font-semibold mb-4 flex items-center gap-2"
                       style={{ color: theme.black }}
                     >
+                      <EnvelopeIcon className="w-5 h-5" style={{ color: theme.blue }} />
                       معلومات الاتصال
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div className="flex items-start gap-3">
                         <div 
-                          className="p-2 rounded-lg shadow-sm"
+                          className="p-2 rounded-lg"
                           style={{ 
                             backgroundColor: theme.blue + '10',
-                            boxShadow: `0 1px 2px ${theme.gray}20`
                           }}
                         >
                           <EnvelopeIcon className="w-5 h-5" style={{ color: theme.blue }} />
@@ -169,12 +223,12 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                           <p className="font-medium" style={{ color: theme.black }}>{member.email}</p>
                         </div>
                       </div>
+                      
                       <div className="flex items-start gap-3">
                         <div 
-                          className="p-2 rounded-lg shadow-sm"
+                          className="p-2 rounded-lg"
                           style={{ 
                             backgroundColor: theme.blue + '10',
-                            boxShadow: `0 1px 2px ${theme.gray}20`
                           }}
                         >
                           <PhoneIcon className="w-5 h-5" style={{ color: theme.blue }} />
@@ -200,12 +254,13 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                     }}
                   >
                     <h3 
-                      className="text-lg font-semibold mb-4"
+                      className="text-lg font-semibold mb-4 flex items-center gap-2"
                       style={{ color: theme.black }}
                     >
+                      <KeyIcon className="w-5 h-5" style={{ color: theme.blue }} />
                       معلومات النظام
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div className="space-y-1">
                         <label 
                           className="text-sm flex items-center gap-2"
@@ -215,13 +270,14 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                           تاريخ الانضمام
                         </label>
                         <p className="font-medium" style={{ color: theme.black }}>
-                          {new Date(member.joinDate).toLocaleDateString('ar-EG', {
+                          {new Date(member.createdAt).toLocaleDateString('ar-EG', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
                           })}
                         </p>
                       </div>
+                      
                       <div className="space-y-1">
                         <label 
                           className="text-sm flex items-center gap-2"
@@ -241,29 +297,72 @@ export default function MemberDetailsModal({ member, onClose, activityLogs, isLo
                       </div>
                     </div>
                   </div>
-
-                  {/* حالة العضو */}
-                  <div 
-                    className="flex items-center gap-3 p-4 rounded-xl"
-                    style={{ 
-                      backgroundColor: theme.yellow + '20',
-                      border: `1px solid ${theme.yellow + '40'}`
-                    }}
-                  >
-                    <div 
-                      className="h-2 w-2 rounded-full animate-pulse"
-                      style={{ backgroundColor: theme.yellow }}
-                    />
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: theme.yellow }}
-                    >
-                      نشط الآن
-                    </span>
-                  </div>
                 </div>
-              )}
-            </>
+
+                {/* حالة العضو */}
+                <div 
+                  className="flex items-center gap-3 p-4 rounded-xl"
+                  style={{ 
+                    backgroundColor: theme.yellow + '20',
+                    border: `1px solid ${theme.yellow + '40'}`
+                  }}
+                >
+                  <div 
+                    className="h-2 w-2 rounded-full animate-pulse"
+                    style={{ backgroundColor: theme.yellow }}
+                  />
+                  <span 
+                    className="text-sm font-medium"
+                    style={{ color: theme.yellow }}
+                  >
+                    نشط الآن
+                  </span>
+                </div>
+              </Tab.Panel>
+              
+              {/* Permissions Tab */}
+              <Tab.Panel className="p-6">
+                <h3 
+                  className="text-lg font-semibold mb-4 flex items-center gap-2"
+                  style={{ color: theme.black }}
+                >
+                  <ShieldCheckIcon className="w-5 h-5" style={{ color: theme.blue }} />
+                  الصلاحيات الممنوحة ({translatedPermissions.length})
+                </h3>
+                
+                {translatedPermissions.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {translatedPermissions.map((perm, index) => (
+                      <div 
+                        key={index} 
+                        className="p-3 rounded-lg border flex items-start gap-2"
+                        style={{ 
+                          backgroundColor: theme.blue + '10',
+                          borderColor: theme.blue + '40'
+                        }}
+                      >
+                        <div className="mt-0.5">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.blue + '20' }}>
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: theme.blue }}></div>
+                          </div>
+                        </div>
+                        <span className="font-medium" style={{ color: theme.black }}>{perm}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center">
+                    <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: theme.blue + '10' }}>
+                      <ShieldCheckIcon className="w-8 h-8" style={{ color: theme.blue }} />
+                    </div>
+                    <h4 className="text-lg font-medium mb-2" style={{ color: theme.black }}>لا توجد صلاحيات ممنوحة</h4>
+                    <p className="text-sm max-w-md mx-auto" style={{ color: theme.gray }}>
+                      لم يتم منح هذا المستخدم أي صلاحيات خاصة. يمكنك تعديل الصلاحيات من لوحة إدارة الفريق.
+                    </p>
+                  </div>
+                )}
+              </Tab.Panel>
+            </Tab.Panels>
           )}
         </div>
       </div>
