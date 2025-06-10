@@ -7,7 +7,6 @@ const AddEduGat = () => {
   const [category, setCategory] = useState('');
   const [coursesCount, setCoursesCount] = useState('');
   const [description, setDescription] = useState('');
-  const [editId, setEditId] = useState(null);
 
   // إضافة أو تعديل مسار
   const handleSubmit = (e) => {
@@ -48,7 +47,7 @@ const AddEduGat = () => {
     setCategory(track.category);
     setCoursesCount(track.coursesCount);
     setDescription(track.description);
-    setEditId(track.id);
+  setEditDocumentId(track.documentId); // ✅ تم التعيين بشكل صحيح
   };
 
   return (
@@ -56,7 +55,7 @@ const AddEduGat = () => {
       {/* نموذج الإضافة */}
       <div className="bg-white rounded-xl shadow-md p-6 mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {editId ? 'تعديل المسار التعليمي' : 'إضافة مسار تعليمي جديد'}
+          {ededitDocumentIditId ? 'تعديل المسار التعليمي' : 'إضافة مسار تعليمي جديد'}
         </h2>
         
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,14 +114,14 @@ const AddEduGat = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
-              {editId ? 'تحديث' : 'إضافة'}
+              {editDocumentId ? 'تحديث' : 'إضافة'}
             </button>
 
-            {editId && (
+            {editDocumentId && (
               <button
                 type="button"
                 onClick={() => {
-                  setEditId(null);
+                  editDocumentId(null);
                   setTrackName('');
                   setCategory('');
                   setCoursesCount('');

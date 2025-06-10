@@ -23,23 +23,23 @@ const AddEduGat = () => {
     description: '',
     numOfCourse: 0,
   });
-  const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [expandedTrack, setExpandedTrack] = useState(null);
-
+const [editDocumentId, setEditDocumentId] = useState(null); // documentId
   // جلب مسارات المستخدم
   const fetchUserTracks = async () => {
     try {
       setLoading(true);
       const response = await api.getUserTracks(user?.id);
 
+
       // التحقق من بنية الاستجابة
       const safeData = response?.data?.data || [];
 
       const formattedTracks = safeData.map(track => ({
-        id: track?.id,
+        documentId: track?.documentId, // documentId الجديد
         name: track?.name || 'بدون اسم',
         description: track?.description || 'لا يوجد وصف',
         numOfCourse: track?.numOfCourse || 0,
@@ -59,61 +59,85 @@ const AddEduGat = () => {
   useEffect(() => {
     if (user?.id) fetchUserTracks();
   }, [user]);
-
+const toggleTrackDetails = (documentId) => {
+    setExpandedTrack(prev => prev === documentId ? null : documentId);
+  };
+const handleEdit = (track) => {
+    if (!track || !track.documentId) return;
+    
+    setTrackData({
+      name: track.name || '',
+      description: track.description || '',
+      numOfCourse: track.numOfCourse || 0
+    });
+    setEditDocumentId(track.documentId);
+    window.scrollTo({ 
+      top: 0, 
+      behavior: 'smooth' 
+    });
+  };
   // معالجة الإرسال
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!user?.id) {
       setError('يجب تسجيل الدخول أولاً');
       return;
     }
-
+    
     if (!validateForm()) return;
-
+    
     try {
-    setLoading(true);
-    const payload = {
-      data: {
+      setLoading(true);
+      
+      const payload = {
         name: trackData.name,
         description: trackData.description,
         numOfCourse: Number(trackData.numOfCourse),
         users_permissions_user: user.id
-      }
-    };
-
-      let response;
-      if (editId) {
-        // التحديث: استدعاء API بدون user.id كمعامل ثالث
-        response = await api.updateTrack(editId, payload);
-const updatedTrack = response;
-        // التحديث: معالجة الاستجابة بشكل صحيح لـ Strapi v4
-        setTracks(tracks.map(t =>
-          t.id === editId ? {
-            ...t,
-           name: updatedTrack.name,
-    description: updatedTrack.description,
-    numOfCourse: updatedTrack.numOfCourse,
-    createdAt: updatedTrack.createdAt ? new Date(updatedTrack.createdAt).toLocaleDateString('ar-EG') : t.createdAt
-  } : t
-      ));
-    } else {
-        response = await api.createTrack(payload);
-       const newTrack = {
-        id: response.data.id,
-        name: response.data.name,
-        description: response.data.description,
-        numOfCourse: response.data.numOfCourse,
-        createdAt: response.data.createdAt
-          ? new Date(response.data.createdAt).toLocaleDateString('ar-EG')
-          : new Date().toLocaleDateString('ar-EG')
-          
       };
       
-      setTracks([newTrack, ...tracks]);
-    }
-
+      let response;
+      
+      if (editDocumentId) {
+        // التحديث باستخدام documentId
+        response = await api.updateTrack(editDocumentId, payload);
+        const updatedTrack = response;
+        
+        // تحديث الحالة باستخدام documentId
+        setTracks(tracks.map(t => 
+          t.documentId === editDocumentId ? {
+            ...t,
+            name: updatedTrack.name,
+            description: updatedTrack.description,
+            numOfCourse: updatedTrack.numOfCourse,
+            createdAt: updatedTrack.createdAt 
+              ? new Date(updatedTrack.createdAt).toLocaleDateString('ar-EG') 
+              : t.createdAt
+          } : t
+        ));
+      } else {
+        // الإضافة
+        response = await api.createTrack(payload);
+        
+        const newTrack = {
+          documentId: response.documentId,
+          name: response.name,
+          description: response.description,
+          numOfCourse: response.numOfCourse,
+          createdAt: response.createdAt
+            ? new Date(response.createdAt).toLocaleDateString('ar-EG')
+            : new Date().toLocaleDateString('ar-EG')
+        };
+        
+        setTracks([newTrack, ...tracks]);
+      }
+      
+      // تحديث الجدول بعد العملية
+      await fetchUserTracks();
+      
       resetForm();
-      setSuccess(editId ? 'تم تحديث المسار بنجاح 🎉' : 'تم إضافة المسار بنجاح 🎉');
+      setSuccess(editDocumentId ? 'تم تحديث المسار بنجاح 🎉' : 'تم إضافة المسار بنجاح 🎉');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       handleApiError(err, 'حدث خطأ أثناء العملية');
@@ -125,16 +149,17 @@ const updatedTrack = response;
   // التحقق من صحة البيانات
   const validateForm = () => {
     const errors = [];
+    
     if (!trackData.name?.trim()) errors.push('اسم المسار مطلوب');
     if (isNaN(Number(trackData.numOfCourse))) errors.push('عدد الدورات يجب أن يكون رقمًا');
-
+    
     if (errors.length > 0) {
       setError(errors.join(' - '));
       return false;
     }
+    
     return true;
   };
-
   // معالجة الأخطاء
   const handleApiError = (error, defaultMessage) => {
     let errorMessage = defaultMessage;
@@ -157,23 +182,7 @@ const updatedTrack = response;
   };
 
   // تعبئة الحقول عند التعديل
-  const handleEdit = (track) => {
-    if (!track) return;
-
-    setTrackData({
-      name: track.name || '',
-      description: track.description || '',
-      numOfCourse: track.numOfCourse || 0
-    });
-
-    setEditId(track.id);
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-      block: 'start'
-    });
-  };
-
+  
   // إعادة تعيين النموذج
   const resetForm = () => {
     setTrackData({
@@ -181,13 +190,11 @@ const updatedTrack = response;
       description: '',
       numOfCourse: 0
     });
-    setEditId(null);
+    setEditDocumentId(null);
   };
 
   // تبديل تفاصيل المسار
-  const toggleTrackDetails = (id) => {
-    setExpandedTrack(expandedTrack === id ? null : id);
-  };
+  
 
   return (
     <motion.div
@@ -213,6 +220,7 @@ const updatedTrack = response;
             </button>
           </motion.div>
         )}
+
 
         {success && (
           <motion.div
@@ -258,7 +266,7 @@ const updatedTrack = response;
             <FiPlus className="text-xl" style={{ color: COLORS.blue }} />
           </div>
           <h2 className="text-xl font-bold" style={{ color: COLORS.black }}>
-            {editId ? 'تعديل المسار' : 'إضافة مسار جديد'}
+            {editDocumentId ? 'تعديل المسار' : 'إضافة مسار جديد'}
           </h2>
         </div>
 
@@ -348,13 +356,13 @@ const updatedTrack = response;
                 <span className="animate-pulse">جاري الحفظ...</span>
               ) : (
                 <>
-                  {editId ? <FiSave /> : <FiPlus />}
-                  {editId ? 'حفظ التعديلات' : 'إضافة مسار'}
+                  {editDocumentId ? <FiSave /> : <FiPlus />}
+                  {editDocumentId ? 'حفظ التعديلات' : 'إضافة مسار'}
                 </>
               )}
             </button>
 
-            {editId && (
+            {editDocumentId && (
               <button
                 type="button"
                 onClick={resetForm}
@@ -409,7 +417,7 @@ const updatedTrack = response;
               
               <motion.div
               
-      key={track.id + '_' + track.createdAt} // إضافة معرّف إضافي لمنع التكرار
+            key={track.documentId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="rounded-xl overflow-hidden shadow-md transition-all hover:shadow-lg"
@@ -451,7 +459,7 @@ const updatedTrack = response;
                       <span className="hidden sm:inline">تعديل</span>
                     </button>
                     <div
-                      className={`transform transition-transform ${expandedTrack === track.id ? 'rotate-180' : ''}`}
+                      className={`transform transition-transform ${expandedTrack === track.documentId ? 'rotate-180' : ''}`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style={{ color: COLORS.gray }}>
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -461,7 +469,7 @@ const updatedTrack = response;
                 </div>
 
                 <AnimatePresence>
-                  {expandedTrack === track.id && (
+              {expandedTrack === track.documentId && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
