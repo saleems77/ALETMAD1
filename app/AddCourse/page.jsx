@@ -1,5 +1,5 @@
-    "use client";
-import React, { useState, useEffect } from "react";
+"use client";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Link from 'next/link';
@@ -24,9 +24,12 @@ import {
   FiInfo,
   FiDollarSign,
   FiGift,
-  FiImage
+  FiImage,
+  FiAlertCircle,
+  FiCheck
 } from "react-icons/fi";
 
+// ألوان مخصصة للمكون
 const COLORS = {
   primary: "#008DCB",
   secondary: "#0D1012",
@@ -34,12 +37,19 @@ const COLORS = {
   danger: "#E2101E",
   background: "#FFFFFF",
   accent: "#F9D011",
+  success: "#28A745"
+};
+
+// أنواع التنبيهات
+const ALERT_TYPES = {
+  ERROR: 'error',
+  SUCCESS: 'success'
 };
 
 // تحديث مصفوفة الخطوات لإضافة خطوة جديدة
 const STEPS = [
   { id: 1, title: "المعلومات الأساسية", icon: <FiBook /> },
-  { id: 2, title: "صورة الغلاف", icon: <FiImage /> }, // خطوة جديدة
+  { id: 2, title: "صورة الغلف", icon: <FiImage /> }, // خطوة جديدة
   { id: 3, title: "الأهداف التعليمية", icon: <FiTarget /> },
   { id: 4, title: "المتطلبات", icon: <FiList /> },
   { id: 5, title: "الفئة المستهدفة", icon: <FiUsers /> },
@@ -50,10 +60,22 @@ const STEPS = [
 ];
 
 const AddCourseComponent = () => {
+  // تعقب حالة المكون لتجنب تحديث الحالة بعد إلغاء التثبيت
+  const isMounted = useRef(true);
+
+  // حالات التحميل الجديدة
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [isProcessingVideo, setIsProcessingVideo] = useState(false); // حالة معالجة الفيديو
+  
+  // حالة الرسائل التنبيهية
+  const [alert, setAlert] = useState(null);
+  
   const [formData, setFormData] = useState({
     courseName: "",
     track: null,
-    coverImage: null, // حقل جديد لصورة الغلاف
+    coverImage: null, // حقل جديد لصورة الغلف
     learningObjectives: "",
     requirements: "",
     targetAudience: "",
@@ -61,60 +83,146 @@ const AddCourseComponent = () => {
     isFree: true,
     attachments: [],
     videos: [],
-    newVideo: { title: "", file: null, duration: "" },
+    newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
     hasEntryTest: false,
     accessInstructions: "",
   });
-  
   const [activeStep, setActiveStep] = useState(1);
-  const [error, setError] = useState("");
   const [tracks, setTracks] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingTracks, setIsLoadingTracks] = useState(true);
-  const [coverImagePreview, setCoverImagePreview] = useState(null); // معاينة الصورة
-const [isUploading, setIsUploading] = useState(false);
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
+
+  // تنظيف الموارد عند إلغاء تثبيت المكون
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   // جلب الفئات من Strapi
   useEffect(() => {
     const fetchTracks = async () => {
       try {
         const { data } = await axios.get(
-  `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/tracks?populate=*`
+          `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/tracks?populate=*`
         );
-        setTracks(data.data); // Strapi v5 يعيد البيانات ضمن data.data
+        if (isMounted.current) {
+          setTracks(data.data);
+        }
       } catch (error) {
-        setError("فشل في تحميل الفئات التعليمية");
+        if (isMounted.current) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "فشل في تحميل الفئات التعليمية",
+            "تعذر تحميل الفئات من الخادم",
+            "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني"
+          );
+        }
       } finally {
-        setIsLoadingTracks(false);
+        if (isMounted.current) {
+          setIsLoadingTracks(false);
+        }
       }
     };
     fetchTracks();
   }, []);
 
-  // التحقق من صحة الخطوة
+  // إعدادات التنبيهات
+  const showAlert = (type, message, cause, solution) => {
+    if (!isMounted.current) return;
+    
+    setAlert({ type, message, cause, solution });
+    
+    // إخفاء التنبيه بعد 5 ثوانٍ
+    setTimeout(() => {
+      if (isMounted.current) {
+        setAlert(null);
+      }
+    }, 5000);
+  };
+
+  // التحقق من صحة الخطوة مع إنشاء رسائل خطأ مفصلة
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        return !!formData.courseName && !!formData.track?.id;
-      case 2: // التحقق من صورة الغلاف
-        return !!formData.coverImage;
+        if (!formData.courseName) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "اسم الدورة مطلوب",
+            "لم يتم إدخال اسم الدورة التعليمية",
+            "يرجى إدخال اسم الدورة في الحقل المخصص"
+          );
+          return false;
+        }
+        if (!formData.track?.id) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "الفئة التعليمية مطلوبة",
+            "لم يتم اختيار الفئة التعليمية للدورة",
+            "يرجى اختيار الفئة المناسبة من القائمة المنسدلة"
+          );
+          return false;
+        }
+        break;
+        
+      case 2:
+        if (!formData.coverImage) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "صورة الغلف مطلوبة",
+            "لم يتم رفع صورة الغلف للدورة",
+            "يرجى رفع صورة مناسبة بتنسيق JPEG/PNG/WEBP"
+          );
+          return false;
+        }
+        break;
+        
       case 3:
-        return !!formData.learningObjectives.trim();
-      case 4:
-        return !!formData.requirements;
-      case 5:
-        return !!formData.targetAudience;
+        if (!formData.learningObjectives.trim()) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "الأهداف التعليمية مطلوبة",
+            "لم يتم إدخال الأهداف التعليمية للدورة",
+            "يرجى كتابة الأهداف التعليمية الرئيسية في الحقل المخصص"
+          );
+          return false;
+        }
+        break;
+        
       case 6:
-        return formData.isFree || formData.price > 0;
-      case 7:
-        return !!formData.accessInstructions.trim();
-      default:
-        return true;
+        if (!formData.isFree && formData.price <= 0) {
+          showAlert(
+            ALERT_TYPES.ERROR,
+            "سعر غير صالح",
+            "السعر يجب أن يكون أكبر من الصفر للدورات المدفوعة",
+            "يرجى إدخال سعر صحيح أو تحديد أن الدورة مجانية"
+          );
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
+
+  // إخفاء التنبيه عند تغيير الخطوة
+  useEffect(() => {
+    setAlert(null);
+  }, [activeStep]);
+
+  // التالي
+  const handleNext = () => {
+    if (validateStep(activeStep)) {
+      setActiveStep((prev) => Math.min(prev + 1, STEPS.length));
     }
   };
 
-  // معالجة رفع الملفات
+  // معالجة رفع المرفقات
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
+    
     // التحقق من أنواع الملفات المسموحة
     const allowedTypes = [
       "application/pdf",
@@ -127,24 +235,35 @@ const [isUploading, setIsUploading] = useState(false);
       (file) => !allowedTypes.includes(file.type)
     );
     if (invalidFiles.length > 0) {
-      setError("الملفات المسموحة: PDF, DOC, DOCX, JPG, PNG");
+      showAlert(
+        ALERT_TYPES.ERROR,
+        "ملفات غير مدعومة",
+        "تم اختيار ملفات بتنسيقات غير مسموح بها",
+        "يرجى رفع ملفات بصيغة PDF, DOC, DOCX, JPG, أو PNG فقط"
+      );
       return;
     }
     
     // التحقق من حجم الملف (5MB كحد أقصى)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     const largeFiles = files.filter((file) => file.size > maxSize);
     if (largeFiles.length > 0) {
-      setError("الحجم الأقصى للملف الواحد 5MB");
+      showAlert(
+        ALERT_TYPES.ERROR,
+        "حجم الملف كبير جداً",
+        "بعض الملفات تتجاوز الحد الأقصى المسموح (5MB)",
+        "يرجى رفع ملفات أصغر من 5MB"
+      );
       return;
     }
     
+    setIsUploadingAttachments(true);
     const formDataUpload = new FormData();
     files.forEach((file) => formDataUpload.append("files", file));
     
     try {
       const { data } = await axios.post(
-       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/upload`,
+        `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/upload`,
         formDataUpload,
         {
           headers: {
@@ -154,43 +273,72 @@ const [isUploading, setIsUploading] = useState(false);
         }
       );
       
-      // التحقق من استجابة Strapi
       if (data && data.length > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          attachments: [
-            ...prev.attachments,
-            ...data.map((file) => ({
-              id: file.id, // تأكد من الهيكل الصحيح للاستجابة
-            })),
-          ],
-        }));
+        if (isMounted.current) {
+          setFormData((prev) => ({
+            ...prev,
+            attachments: [
+              ...prev.attachments,
+              ...data.map((file) => ({
+                id: file.id,
+                name: file.name,
+                size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+              })),
+            ],
+          }));
+          
+          showAlert(
+            ALERT_TYPES.SUCCESS,
+            "تم رفع الملفات بنجاح",
+            "تم رفع جميع الملفات المختارة",
+            "يمكنك متابعة الخطوة التالية"
+          );
+        }
       } else {
         throw new Error("فشل في رفع الملفات");
       }
     } catch (error) {
       let errorMessage = "فشل في رفع الملفات";
+      let errorCause = "حدث خطأ غير متوقع";
+      let errorSolution = "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني";
+      
       if (error.response) {
-        // معالجة أخطاء Strapi
         switch (error.response.status) {
           case 401:
             errorMessage = "غير مصرح بالرفع، يرجى تسجيل الدخول";
+            errorCause = "انتهاء جلسة المستخدم";
+            errorSolution = "يرجى تسجيل الدخول مجددًا والمحاولة مرة أخرى";
             break;
           case 413:
             errorMessage = "الحجم الكلي للملفات يتجاوز الحد المسموح";
+            errorCause = "حجم الملفات المرفوعة كبير جدًا";
+            errorSolution = "يرجى تقليل عدد الملفات أو تقليل حجمها";
             break;
           case 400:
             errorMessage = "نوع الملف غير مدعوم";
+            errorCause = "تم اختيار ملفات بتنسيقات غير مسموح بها";
+            errorSolution = "يرجى رفع ملفات بصيغة PDF, DOC, DOCX, JPG, أو PNG فقط";
             break;
           default:
             errorMessage = error.response.data?.error?.message || errorMessage;
+            errorCause = error.response.data?.error?.message || errorCause;
         }
       }
-      setError(errorMessage);
+      
+      showAlert(
+        ALERT_TYPES.ERROR,
+        errorMessage,
+        errorCause,
+        errorSolution
+      );
+    } finally {
+      if (isMounted.current) {
+        setIsUploadingAttachments(false);
+      }
     }
   };
 
-  // معالجة رفع صورة الغلاف
+  // معالجة رفع صورة الغلف
   const handleCoverImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -198,18 +346,28 @@ const [isUploading, setIsUploading] = useState(false);
     // التحقق من نوع الملف
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setError("نوع الصورة غير مدعوم. يُسمح بـ JPEG, PNG, أو WEBP");
+      showAlert(
+        ALERT_TYPES.ERROR,
+        "نوع الصورة غير مدعوم",
+        "الصيغة غير مدعومة",
+        "يرجى رفع صورة بتنسيق JPEG, PNG, أو WEBP"
+      );
       return;
     }
     
     // التحقق من الحجم (5MB كحد أقصى)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setError("الحجم الأقصى للصورة 5MB");
+      showAlert(
+        ALERT_TYPES.ERROR,
+        "الحجم الأقصى للصورة 5MB",
+        "الصورة تتجاوز الحد الأقصى المسموح",
+        "يرجى رفع صورة أصغر من 5MB"
+      );
       return;
     }
-
-    // إنشاء كائن FormData
+    
+    setIsUploadingCover(true);
     const formDataUpload = new FormData();
     formDataUpload.append("files", file);
     
@@ -225,102 +383,186 @@ const [isUploading, setIsUploading] = useState(false);
         }
       );
       
-      // تحديث حالة النموذج بصورة الغلاف
       if (data && data.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          coverImage: data[0].id
-        }));
-        
-        // إنشاء معاينة للصورة
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setCoverImagePreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
+        if (isMounted.current) {
+          setFormData(prev => ({
+            ...prev,
+            coverImage: data[0].id
+          }));
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (isMounted.current) {
+              setCoverImagePreview(e.target.result);
+            }
+          };
+          reader.readAsDataURL(file);
+          
+          showAlert(
+            ALERT_TYPES.SUCCESS,
+            "تم رفع صورة الغلف بنجاح",
+            "تم رفع صورة الغلف بنجاح",
+            "يمكنك متابعة الخطوة التالية"
+          );
+        }
       }
     } catch (error) {
-      let errorMessage = "فشل في رفع صورة الغلاف";
+      let errorMessage = "فشل في رفع صورة الغلف";
+      let errorCause = "حدث خطأ غير متوقع";
+      let errorSolution = "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني";
+      
       if (error.response) {
         switch (error.response.status) {
           case 401:
             errorMessage = "غير مصرح برفع الصور، يرجى تسجيل الدخول";
+            errorCause = "انتهاء جلسة المستخدم";
+            errorSolution = "يرجى تسجيل الدخول مجددًا والمحاولة مرة أخرى";
             break;
           case 413:
             errorMessage = "الصورة تتجاوز الحجم المسموح";
+            errorCause = "حجم الصورة كبير جدًا";
+            errorSolution = "يرجى رفع صورة أصغر من 5MB";
             break;
           default:
             errorMessage = error.response.data?.error?.message || errorMessage;
+            errorCause = error.response.data?.error?.message || errorCause;
         }
       }
-      setError(errorMessage);
+      
+      showAlert(
+        ALERT_TYPES.ERROR,
+        errorMessage,
+        errorCause,
+        errorSolution
+      );
+    } finally {
+      if (isMounted.current) {
+        setIsUploadingCover(false);
+      }
     }
   };
 
-  const handleNext = () => {
-    if (validateStep(activeStep)) {
-      setActiveStep(prev => Math.min(prev + 1, STEPS.length));
-    }
-  };
-
-  // إضافة فيديو جديد
+  // رفع الفيديو
   const uploadVideo = async (file) => {
+    if (!isMounted.current) return null;
+    
+    setIsUploadingVideo(true);
     const videoFormData = new FormData();
     videoFormData.append('files', file);
     videoFormData.append('fileInfo', JSON.stringify({
       alternativeText: `فيديو: ${file.name}`,
       caption: formData.newVideo.duration
     }));
-    const { data } = await axios.post(
-       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/upload`,
-      videoFormData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-          "Content-Type": "multipart/form-data",
-        },
+    
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/upload`,
+        videoFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return data[0]?.id || null;
+    } catch (error) {
+      let errorMessage = "فشل في رفع الفيديو";
+      let errorCause = "حدث خطأ غير متوقع";
+      let errorSolution = "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني";
+      
+      if (error.response) {
+        errorMessage = error.response.data?.error?.message || errorMessage;
+        errorCause = error.response.data?.error?.message || errorCause;
       }
-    );
-    return data[0].id; // إرجاع ID الفيديو
+      
+      showAlert(
+        ALERT_TYPES.ERROR,
+        errorMessage,
+        errorCause,
+        errorSolution
+      );
+      throw error;
+    } finally {
+      if (isMounted.current) {
+        setIsUploadingVideo(false);
+      }
+    }
+  };
+
+  // تنسيق مدة الفيديو
+  const formatDuration = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
   // إضافة فيديو جديد
-  // تأكد من أن وظيفة handleAddVideo معرفة داخل المكون 
-// وبعد تعريف setIsUploading
-const handleAddVideo = async () => {
-  if (!formData.newVideo.file || !formData.newVideo.title) return;
-  try {
-    setIsUploading(true);
-    // رفع الفيديو وأخذ ID
-    const videoId = await uploadVideo(formData.newVideo.file);
-    // تحديث حالة الفيديوهات
-    setFormData(prev => ({
-      ...prev,
-      videos: [...prev.videos, {
-        title: prev.newVideo.title,
-        duration: prev.newVideo.duration,
-        videoFile: videoId // تخزين ID مباشر
-      }],
-      newVideo: { title: '', file: null, duration: '' }
-    }));
-  } catch (error) {
-    setError('فشل في رفع الفيديو: ' + error.message);
-  } finally {
-    setIsUploading(false);
-  }
-};
+  const handleAddVideo = async () => {
+    if (!formData.newVideo.file || !formData.newVideo.title) return;
+    
+    try {
+      const videoId = await uploadVideo(formData.newVideo.file);
+      
+      if (isMounted.current) {
+        setFormData(prev => ({
+          ...prev,
+          videos: [
+            ...prev.videos,
+            {
+              title: prev.newVideo.title,
+              duration: prev.newVideo.duration,
+              videoFile: videoId,
+              fileName: prev.newVideo.fileName,
+              fileSize: prev.newVideo.fileSize,
+            },
+          ],
+          newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
+        }));
+        
+        showAlert(
+          ALERT_TYPES.SUCCESS,
+          "تم رفع الفيديو بنجاح",
+          "تم رفع الفيديو المحدد",
+          "يمكنك متابعة الخطوة التالية"
+        );
+      }
+    } catch (error) {
+      let errorMessage = "فشل في رفع الفيديو";
+      let errorCause = "حدث خطأ غير متوقع";
+      let errorSolution = "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني";
+      
+      if (error.response) {
+        errorMessage = error.response.data?.error?.message || errorMessage;
+        errorCause = error.response.data?.error?.message || errorCause;
+      }
+      
+      showAlert(
+        ALERT_TYPES.ERROR,
+        errorMessage,
+        errorCause,
+        errorSolution
+      );
+    } finally {
+      if (isMounted.current) {
+        setIsUploadingVideo(false);
+      }
+    }
+  };
 
+  // الحصول على معرف المستخدم من JWT
   function getUserIdFromJwt(jwt) {
     try {
       const base64Url = jwt.split('.')[1];
       const base64 = base64Url.replace(/-/g, '_').replace(/_/g, '/');
       const payload = JSON.parse(window.atob(base64));
-      return payload.id; // ID المستخدم من التوكن
+      return payload.id;
     } catch (e) {
       return null;
     }
   }
 
+  // التحقق من صحة جميع الخطوات
   const validateAllSteps = () => {
     return STEPS.every(step => validateStep(step.id));
   };
@@ -330,14 +572,20 @@ const handleAddVideo = async () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    
     const jwt = localStorage.getItem('jwt');
     if (!jwt) {
-      setError('يرجى تسجيل الدخول أولاً');
+      showAlert(
+        ALERT_TYPES.ERROR,
+        "يرجى تسجيل الدخول أولاً",
+        "لا يمكنك إرسال النموذج دون تسجيل الدخول",
+        "يرجى تسجيل الدخول قبل إرسال الدورة"
+      );
       setIsSubmitting(false);
       return;
     }
+    
     try {
-      // استخرج ID المستخدم من التوكن
       const userId = getUserIdFromJwt(jwt);
       const payload = {
         data: {
@@ -349,55 +597,76 @@ const handleAddVideo = async () => {
           isFree: formData.isFree,
           accessInstructions: formData.accessInstructions,
           hasEntryTest: formData.hasEntryTest,
-          // علاقات Strapi 5
-          track: formData.track.id, // manyToOne
-          attachments: formData.attachments.map(f => f.id), // media مباشرة
-          // ربط المستخدم
-          users_permissions_user: userId, // manyToOne
-          // فيديوهات كمركبات
+          track: formData.track.id,
+          attachments: formData.attachments.map(f => f.id),
+          users_permissions_user: userId,
           videos: formData.videos.map(video => ({
             title: video.title,
             duration: video.duration,
-            videoFile: video.videoFile // ID مباشر
+            videoFile: video.videoFile
           })),
-          // إضافة صورة الغلاف
-          coverImage: formData.coverImage // علاقة media
+          coverImage: formData.coverImage
         }
       };
       
-      await axios.post(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/courses`, payload, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json"
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/courses`, 
+        payload, 
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+            "Content-Type": "application/json"
+          }
         }
-      });
+      );
       
-      alert('تم إنشاء الدورة بنجاح!');
-      // إعادة تعيين النموذج
-      setFormData({
-        courseName: '',
-        track: null,
-        coverImage: null,
-        learningObjectives: '',
-        requirements: '',
-        targetAudience: '',
-        price: 0,
-        isFree: true,
-        accessInstructions: '',
-        hasEntryTest: false,
-        attachments: [],
-        videos: [],
-        newVideo: { title: '', file: null, duration: '' },
-      });
-      setCoverImagePreview(null);
-      setActiveStep(1); // العودة إلى الخطوة الأولى
+      if (isMounted.current) {
+        showAlert(
+          ALERT_TYPES.SUCCESS,
+          "تم إنشاء الدورة بنجاح!",
+          "تم حفظ الدورة بنجاح",
+          "يمكنك الانتقال إلى الدورة الجديدة الآن"
+        );
+        
+        // إعادة تعيين النموذج
+        setFormData({
+          courseName: '',
+          track: null,
+          coverImage: null,
+          learningObjectives: '',
+          requirements: '',
+          targetAudience: '',
+          price: 0,
+          isFree: true,
+          accessInstructions: '',
+          hasEntryTest: false,
+          attachments: [],
+          videos: [],
+          newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
+        });
+        setCoverImagePreview(null);
+        setActiveStep(1);
+      }
     } catch (error) {
-      const errorMessage = error.response?.data?.error?.message || 
-                          error.response?.data?.error?.details?.errors?.[0]?.message || 
-                          'حدث خطأ في الإرسال';
-      setError(errorMessage);
+      let errorMessage = "فشل في إرسال النموذج";
+      let errorCause = "حدث خطأ غير متوقع";
+      let errorSolution = "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني";
+      
+      if (error.response) {
+        errorMessage = error.response.data?.error?.message || errorMessage;
+        errorCause = error.response.data?.error?.message || errorCause;
+      }
+      
+      showAlert(
+        ALERT_TYPES.ERROR,
+        errorMessage,
+        errorCause,
+        errorSolution
+      );
     } finally {
-      setIsSubmitting(false);
+      if (isMounted.current) {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -442,13 +711,13 @@ const handleAddVideo = async () => {
         ))}
         <div className="absolute top-6 left-0 right-0 h-1 bg-gray-100 mx-6">
           <motion.div
-            className="h-full bg-primary"
-            initial={{ width: 0 }}
-            animate={{
-              width: `${((activeStep - 1) / (STEPS.length - 1)) * 100}%`,
-            }}
-            transition={{ duration: 0.5 }}
-          />
+  className="h-full bg-primary"
+  initial={{ width: 0 }}
+  animate={{
+    width: `${progressWidth}%`,
+  }}
+  transition={{ duration: 0.5 }}
+/>
         </div>
       </div>
     </div>
@@ -486,19 +755,18 @@ const handleAddVideo = async () => {
 
   // حقل إدخال مع تحديث عند الخروج من الحقل
   const InputField = ({ label, children, isRequired, name, value, onUpdate }) => {
-    // حالة محلية لتخزين القيمة أثناء الكتابة
     const [localValue, setLocalValue] = useState(value || "");
-
-    // تحديث القيمة المحلية عند كل تغيير
     const handleChange = (e) => {
       setLocalValue(e.target.value);
     };
-
-    // تحديث الحالة الرئيسية عند الخروج من الحقل
     const handleBlur = () => {
       onUpdate(name, localValue);
     };
-
+    
+    useEffect(() => {
+      setLocalValue(value || "");
+    }, [value]);
+    
     return (
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-2">
@@ -519,6 +787,47 @@ const handleAddVideo = async () => {
     );
   };
 
+  // عرض رسالة التنبيه
+  const AlertMessage = () => {
+  if (!alert) return null;
+  
+  return (
+    <motion.div
+      className="mb-6 p-4 rounded-lg"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{
+        background: (alert.type === ALERT_TYPES.ERROR)
+          ? `${COLORS.danger}10`
+          : `${COLORS.success}10`,
+        color: (alert.type === ALERT_TYPES.ERROR)
+          ? COLORS.danger
+          : COLORS.success,
+        borderLeft: `4px solid ${(alert.type === ALERT_TYPES.ERROR) ? COLORS.danger : COLORS.success}`
+      }}
+    >
+      <div className="flex items-start gap-3">
+        {alert.type === ALERT_TYPES.ERROR ? (
+          <FiAlertCircle className="text-xl mt-0.5 flex-shrink-0" />
+        ) : (
+          <FiCheckCircle className="text-xl mt-0.5 flex-shrink-0" />
+        )}
+        <div className="flex-1">
+          <p className="font-medium">{alert.message}</p>
+          <p className="text-sm mt-1"><strong>السبب:</strong> {alert.cause}</p>
+          <p className="text-sm mt-1"><strong>الحل:</strong> {alert.solution}</p>
+        </div>
+        <button 
+          onClick={() => setAlert(null)}
+          className="text-current hover:text-opacity-80"
+        >
+          <FiX />
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
   // محتوى الخطوات
   const StepContent = () => {
     switch (activeStep) {
@@ -531,15 +840,15 @@ const handleAddVideo = async () => {
               icon={<FiBook className="text-white text-xl" />}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             <InputField
-  label="اسم الدورة"
-  isRequired
-  name="courseName"
-  value={formData.courseName}
-  onUpdate={(name, value) =>
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
->
+              <InputField
+                label="اسم الدورة"
+                isRequired
+                name="courseName"
+                value={formData.courseName}
+                onUpdate={(name, value) =>
+                  setFormData((prev) => ({ ...prev, [name]: value }))
+                }
+              >
                 <input
                   type="text"
                   className="w-full p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary"
@@ -549,100 +858,92 @@ const handleAddVideo = async () => {
                   }}
                 />
               </InputField>
-           <InputField
-  label="الفئة التعليمية"
-  isRequired
-  name="track"
-  value={formData.track?.id || ""}
-  onUpdate={(name, value) => {
-    // تأكد من أن القيمة رقم
-    const trackId = parseInt(value);
-    
-    // تأكد من أن القيمة صحيحة
-    if (isNaN(trackId)) {
-      setFormData({
-        ...formData,
-        track: null
-      });
-      return;
-    }
-    
-    // ابحث عن الفئة في القائمة
-    const selectedTrack = tracks.find((t) => t.id === trackId);
-    
-    // تأكد من وجود الفئة قبل استخدامها
-    if (selectedTrack) {
-      setFormData({
-        ...formData,
-        track: {
-          id: selectedTrack.id,
-          name: selectedTrack.name || selectedTrack.attributes?.name,
-        },
-      });
-    } else {
-      setFormData({
-        ...formData,
-        track: null
-      });
-    }
-  }}
->
-  <select
-    className="w-full p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary"
-    style={{
-      borderColor: `${COLORS.muted}40`,
-      focusBorderColor: COLORS.primary,
-    }}
-  >
-    <option value="">اختر الفئة</option>
-    {tracks.map((track) => (
-      <option key={track.id} value={track.id}>
-        {track.name || track.attributes?.name}
-      </option>
-    ))}
-  </select>
-</InputField>
-
-{/* أضف زر الإضافة هنا */}
-<div className="mt-4">
-  <Link 
-    href="/AddEduGat" 
-    passHref
-  >
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="p-3 rounded-lg flex items-center justify-center cursor-pointer"
-      style={{
-        background: COLORS.primary,
-        color: COLORS.background,
-        minWidth: "3rem"
-      }}
-      title="إضافة فئة جديدة"
-      role="button"
-    >
-      <FiPlus className="text-xl" />
-      <span className="ml-2">فئة جديدة</span>
-    </motion.div>
-  </Link>
-</div>
-</div>
-</div>
-
+              <InputField
+                label="الفئة التعليمية"
+                isRequired
+                name="track"
+                value={formData.track?.id || ""}
+                onUpdate={(name, value) => {
+                  const trackId = parseInt(value);
+                  if (isNaN(trackId)) {
+                    setFormData({
+                      ...formData,
+                      track: null
+                    });
+                    return;
+                  }
+                  const selectedTrack = tracks.find((t) => t.id === trackId);
+                  if (selectedTrack && isMounted.current) {
+                    setFormData({
+                      ...formData,
+                      track: {
+                        id: selectedTrack.id,
+                        name: selectedTrack.name || selectedTrack.attributes?.name,
+                      },
+                    });
+                  } else if (isMounted.current) {
+                    setFormData({
+                      ...formData,
+                      track: null
+                    });
+                  }
+                }}
+              >
+                <select
+                  className="w-full p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary"
+                  style={{
+                    borderColor: `${COLORS.muted}40`,
+                    focusBorderColor: COLORS.primary,
+                  }}
+                >
+                  <option value="">اختر الفئة</option>
+                  {tracks.map((track) => (
+                    <option key={track.id} value={track.id}>
+                      {track.name || track.attributes?.name}
+                    </option>
+                  ))}
+                </select>
+              </InputField>
+              <div className="mt-4">
+                <Link href="/AddEduGat" passHref>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-3 rounded-lg flex items-center justify-center cursor-pointer"
+                    style={{
+                      background: COLORS.primary,
+                      color: COLORS.background,
+                      minWidth: "3rem"
+                    }}
+                    title="إضافة فئة جديدة"
+                    role="button"
+                  >
+                    <FiPlus className="text-xl" />
+                    <span className="ml-2">فئة جديدة</span>
+                  </motion.div>
+                </Link>
+              </div>
+            </div>
+          </div>
         );
-      case 2: // خطوة جديدة لصورة الغلاف
+      case 2:
         return (
           <div className="p-6">
             <SectionHeader
-              title="صورة الغلاف"
-              description="قم برفع صورة غلاف للدورة التعليمية"
+              title="صورة الغلف"
+              description="قم برفع صورة غلف للدورة التعليمية"
               icon={<FiImage className="text-white text-xl" />}
             />
             <div className="space-y-4">
               <label
-                className="flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
+                className="relative flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
                 style={{ borderColor: `${COLORS.muted}40` }}
               >
+                {isUploadingCover && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+                    <FiClock className="animate-spin text-primary" size={24} />
+                  </div>
+                )}
                 <FiUpload className="text-muted" />
                 <span className="text-sm">
                   اختر صورة أو اسحبها هنا (JPEG, PNG, WEBP)
@@ -652,15 +953,14 @@ const handleAddVideo = async () => {
                   onChange={handleCoverImageUpload}
                   className="hidden"
                   accept="image/jpeg,image/png,image/webp"
+                  disabled={isUploadingCover}
                 />
               </label>
-              
-              {/* معاينة الصورة */}
               {coverImagePreview && (
                 <div className="relative mt-4">
                   <img
                     src={coverImagePreview}
-                    alt="معاينة صورة الغلاف"
+                    alt="معاينة صورة الغلف"
                     className="w-full h-64 object-cover rounded-lg"
                   />
                   <button
@@ -707,7 +1007,7 @@ const handleAddVideo = async () => {
           <div className="p-6">
             <SectionHeader
               title="المتطلبات الأساسية"
-              description="حدد المعرفة أو المهارات المطلوبة مسبقاً"
+              description="حدد المعرفة أو المهارات المطلوبة مسبقًا"
               icon={<FiList className="text-white text-xl" />}
             />
             <InputField
@@ -776,9 +1076,7 @@ const handleAddVideo = async () => {
                   </div>
                   <div
                     className={`p-3 rounded-lg cursor-pointer transition-all flex-1 text-center ${
-                      !formData.isFree
-                        ? "bg-accent text-secondary"
-                        : "bg-gray-100"
+                      !formData.isFree ? "bg-accent text-secondary" : "bg-gray-100"
                     }`}
                     onClick={() => setFormData({ ...formData, isFree: false })}
                   >
@@ -821,7 +1119,7 @@ const handleAddVideo = async () => {
                   <span className="font-medium">نصائح التسعير</span>
                 </div>
                 <p className="text-sm text-muted">
-                  - اختر سعراً يعكس قيمة المحتوى المقدم
+                  - اختر سعرًا يعكس قيمة المحتوى المقدم
                   <br />
                   - يمكنك إضافة عروض ترويجية لاحقاً
                   <br />- السعر القياسي للدورات المشابهة: $20 - $200
@@ -865,9 +1163,14 @@ const handleAddVideo = async () => {
             />
             <div className="space-y-4">
               <label
-                className="flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
+                className="relative flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
                 style={{ borderColor: `${COLORS.muted}40` }}
               >
+                {isUploadingAttachments && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+                    <FiClock className="animate-spin text-primary" size={24} />
+                  </div>
+                )}
                 <FiUpload className="text-muted" />
                 <span className="text-sm">
                   اختر ملفات أو اسحبها هنا (PDF, DOC, صور)
@@ -878,6 +1181,7 @@ const handleAddVideo = async () => {
                   onChange={handleFileUpload}
                   className="hidden"
                   accept=".pdf,.doc,.docx,.jpg,.png"
+                  disabled={isUploadingAttachments}
                 />
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -892,12 +1196,13 @@ const handleAddVideo = async () => {
                     <div className="flex items-center gap-2 truncate">
                       <FiPaperclip className="text-muted" />
                       <span className="text-sm truncate">{file.name}</span>
+                      <span className="text-xs text-muted ml-2">({file.size})</span>
                     </div>
                     <button
                       onClick={() =>
                         setFormData(prev => ({
                           ...prev,
-                          attachments: prev.attachments.filter((_, i) => i !== index)
+                          attachments: prev.attachments.filter((_, i) => i !== index),
                         }))
                       }
                       className="text-danger hover:text-danger-dark"
@@ -924,8 +1229,7 @@ const handleAddVideo = async () => {
                 style={{ background: `${COLORS.muted}08` }}
               >
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <FiVideo className="text-primary" />
-                  إضافة فيديو جديد
+                  <FiVideo /> إضافة فيديو جديد
                 </h3>
                 <div className="space-y-4">
                   <InputField
@@ -936,7 +1240,7 @@ const handleAddVideo = async () => {
                     onUpdate={(name, value) =>
                       setFormData((prev) => ({
                         ...prev,
-                        newVideo: { ...prev.newVideo, title: value }
+                        newVideo: { ...prev.newVideo, title: value },
                       }))
                     }
                   >
@@ -956,9 +1260,14 @@ const handleAddVideo = async () => {
                       <span className="text-danger">*</span>
                     </div>
                     <label
-                      className="flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
+                      className="relative flex items-center gap-3 p-4 rounded-lg border-2 border-dashed cursor-pointer hover:border-primary transition-colors"
                       style={{ borderColor: `${COLORS.muted}40` }}
                     >
+                      {isUploadingVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+                          <FiClock className="animate-spin text-primary" size={24} />
+                        </div>
+                      )}
                       <FiUpload className="text-muted" />
                       <span className="text-sm truncate">
                         {formData.newVideo.fileName || "اختر ملف فيديو"}
@@ -969,15 +1278,27 @@ const handleAddVideo = async () => {
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files[0];
-                          if (file) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              newVideo: {
-                                ...prev.newVideo,
-                                file: file,
-                                fileName: file.name,
-                              },
-                            }));
+                          if (file && isMounted.current) {
+                            // إنشاء عنصر فيديو لاستخراج المدة
+                            const videoElement = document.createElement('video');
+                            const videoUrl = URL.createObjectURL(file);
+                            videoElement.src = videoUrl;
+                            // استخراج المدة عند توفر البيانات
+                            videoElement.addEventListener('loadedmetadata', () => {
+                              window.URL.revokeObjectURL(videoUrl); // تحرير الذاكرة
+                              const duration = formatDuration(videoElement.duration); // تنسيق المدة
+                              setFormData((prev) => ({
+                                ...prev,
+                                newVideo: {
+                                  ...prev.newVideo,
+                                  file: file,
+                                  fileName: file.name,
+                                  fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+                                  duration: duration,
+                                },
+                              }));
+                            });
+                            videoElement.load(); // تحميل بيانات الفيديو
                           }
                         }}
                       />
@@ -990,16 +1311,20 @@ const handleAddVideo = async () => {
                       background: COLORS.primary,
                       color: COLORS.background,
                       opacity:
-                        !formData.newVideo.title || !formData.newVideo.file
+                        !formData.newVideo.title || !formData.newVideo.file || isUploadingVideo
                           ? 0.6
                           : 1,
                     }}
                     disabled={
-                      !formData.newVideo.title || !formData.newVideo.file
+                      !formData.newVideo.title || !formData.newVideo.file || isUploadingVideo
                     }
                   >
-                    <FiPlus />
-                    إضافة الفيديو
+                    {isUploadingVideo ? (
+                      <FiClock className="animate-spin" />
+                    ) : (
+                      <FiPlus />
+                    )}
+                    {isUploadingVideo ? "جاري الرفع..." : "إضافة الفيديو"}
                   </button>
                 </div>
               </div>
@@ -1024,7 +1349,7 @@ const handleAddVideo = async () => {
                         <h4 className="font-medium">{video.title}</h4>
                         <button
                           onClick={() =>
-                            setFormData((prev) => ({
+                            setFormData(prev => ({
                               ...prev,
                               videos: prev.videos.filter((_, i) => i !== index),
                             }))
@@ -1034,12 +1359,15 @@ const handleAddVideo = async () => {
                           <FiX />
                         </button>
                       </div>
-                      <div className="flex items-center gap-3 text-sm text-muted">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
                         <span className="flex items-center gap-1">
                           <FiClock /> {video.duration || "00:00"}
                         </span>
                         <span className="flex items-center gap-1">
                           <FiFilm /> {video.fileName || `فيديو #${index + 1}`}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <FiDollarSign /> {video.fileSize || "0 MB"}
                         </span>
                       </div>
                     </div>
@@ -1077,20 +1405,7 @@ const handleAddVideo = async () => {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
               >
-                {error && (
-                  <motion.div
-                    className="mb-6 p-4 rounded-lg flex items-center gap-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    style={{
-                      background: `${COLORS.danger}10`,
-                      color: COLORS.danger,
-                    }}
-                  >
-                    <FiInfo className="text-xl" />
-                    {error}
-                  </motion.div>
-                )}
+                <AlertMessage />
                 <StepContent />
               </motion.div>
             </AnimatePresence>
@@ -1126,7 +1441,6 @@ const handleAddVideo = async () => {
                     color: COLORS.background,
                     boxShadow: `0 4px 12px ${COLORS.primary}30`,
                   }}
-                  disabled={!validateStep(activeStep)}
                 >
                   التالي
                   <FiArrowLeft className="transform rotate-180" />
@@ -1134,8 +1448,7 @@ const handleAddVideo = async () => {
               ) : (
                 <div className="ml-auto flex gap-4">
                   <motion.button
-                    type="button"
-                    onClick={handleSubmit}
+                    type="submit"
                     whileHover={{ scale: 1.05 }}
                     className="px-6 py-2.5 rounded-lg flex items-center gap-2"
                     style={{
@@ -1158,4 +1471,4 @@ const handleAddVideo = async () => {
   );
 };
 
-export default AddCourseComponent; 
+export default AddCourseComponent;
