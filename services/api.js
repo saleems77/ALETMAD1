@@ -51,14 +51,7 @@ export default {
       `/tracks?filters[users_permissions_user][id][$eq]=${userId}&populate=*`
     ),
   createTrack: (data) => api.post("/tracks", data),
-  updateTrack: (id, data) =>
-    api.put(
-      `/tracks/${id}`,
-      { data },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    ),
+  updateTrack: (id, data) => api.put(`/tracks/${id}`, data),
   deleteTrack: (id) => api.delete(`/tracks/${id}`),
   getCoursesByTrackId: (trackId) =>
     api.get(`/courses?filters[track][id][$eq]=${trackId}`),

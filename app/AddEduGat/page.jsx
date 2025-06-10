@@ -34,20 +34,20 @@ const AddEduGat = () => {
     try {
       setLoading(true);
       const response = await api.getUserTracks(user?.id);
-      
+
       // التحقق من بنية الاستجابة
       const safeData = response?.data?.data || [];
-      
+
       const formattedTracks = safeData.map(track => ({
-        id: track?.id?.toString() || Date.now().toString(),
+        id: track?.id,
         name: track?.name || 'بدون اسم',
         description: track?.description || 'لا يوجد وصف',
         numOfCourse: track?.numOfCourse || 0,
-        createdAt: track?.createdAt 
+        createdAt: track?.createdAt
           ? new Date(track.createdAt).toLocaleDateString('ar-EG')
           : 'تاريخ غير معروف'
       }));
-      
+
       setTracks(formattedTracks);
     } catch (err) {
       handleApiError(err, 'فشل في تحميل البيانات');
@@ -71,38 +71,46 @@ const AddEduGat = () => {
     if (!validateForm()) return;
 
     try {
-      setLoading(true);
-      
-      const payload = {
-  ...trackData,
- name: trackData.name,
-  description: trackData.description,
-  numOfCourse: Number(trackData.numOfCourse),
-  users_permissions_user: user.id
-};
+    setLoading(true);
+    const payload = {
+      data: {
+        name: trackData.name,
+        description: trackData.description,
+        numOfCourse: Number(trackData.numOfCourse),
+        users_permissions_user: user.id
+      }
+    };
 
       let response;
       if (editId) {
         // التحديث: استدعاء API بدون user.id كمعامل ثالث
         response = await api.updateTrack(editId, payload);
-        
+const updatedTrack = response;
         // التحديث: معالجة الاستجابة بشكل صحيح لـ Strapi v4
-        setTracks(tracks.map(t => 
-  t.id === editId ? { 
-    ...t, 
-    ...response.data, 
-    id: editId,
-    createdAt: new Date(response.data.createdAt).toLocaleDateString('ar-EG')
+        setTracks(tracks.map(t =>
+          t.id === editId ? {
+            ...t,
+           name: updatedTrack.name,
+    description: updatedTrack.description,
+    numOfCourse: updatedTrack.numOfCourse,
+    createdAt: updatedTrack.createdAt ? new Date(updatedTrack.createdAt).toLocaleDateString('ar-EG') : t.createdAt
   } : t
-));
-      } else {
+      ));
+    } else {
         response = await api.createTrack(payload);
-        setTracks([{ 
-          ...response.data, 
-          id: response.data.id,
-          createdAt: new Date().toLocaleDateString('ar-EG')
-        }, ...tracks]);
-      }
+       const newTrack = {
+        id: response.data.id,
+        name: response.data.name,
+        description: response.data.description,
+        numOfCourse: response.data.numOfCourse,
+        createdAt: response.data.createdAt
+          ? new Date(response.data.createdAt).toLocaleDateString('ar-EG')
+          : new Date().toLocaleDateString('ar-EG')
+          
+      };
+      
+      setTracks([newTrack, ...tracks]);
+    }
 
       resetForm();
       setSuccess(editId ? 'تم تحديث المسار بنجاح 🎉' : 'تم إضافة المسار بنجاح 🎉');
@@ -130,7 +138,7 @@ const AddEduGat = () => {
   // معالجة الأخطاء
   const handleApiError = (error, defaultMessage) => {
     let errorMessage = defaultMessage;
-    
+
     if (error.response) {
       // تحسين رسائل الأخطاء بناءً على حالة الاستجابة
       if (error.response.status === 404) {
@@ -143,7 +151,7 @@ const AddEduGat = () => {
     } else {
       errorMessage = error.message || defaultMessage;
     }
-    
+
     setError(errorMessage);
     setTimeout(() => setError(''), 5000);
   };
@@ -151,18 +159,18 @@ const AddEduGat = () => {
   // تعبئة الحقول عند التعديل
   const handleEdit = (track) => {
     if (!track) return;
-    
+
     setTrackData({
       name: track.name || '',
       description: track.description || '',
       numOfCourse: track.numOfCourse || 0
     });
-    
+
     setEditId(track.id);
-    window.scrollTo({ 
-      top: 0, 
+    window.scrollTo({
+      top: 0,
       behavior: 'smooth',
-      block: 'start' 
+      block: 'start'
     });
   };
 
@@ -235,7 +243,7 @@ const AddEduGat = () => {
       </div>
 
       {/* نموذج الإدخال */}
-      <motion.div 
+      <motion.div
         className="rounded-xl shadow-lg p-6 mb-8"
         style={{ backgroundColor: COLORS.white, border: `1px solid ${COLORS.gray}20` }}
         initial={{ y: -20, opacity: 0 }}
@@ -243,7 +251,7 @@ const AddEduGat = () => {
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center gap-3 mb-6">
-          <div 
+          <div
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{ backgroundColor: COLORS.blue + '20' }}
           >
@@ -262,16 +270,16 @@ const AddEduGat = () => {
                 <input
                   type="text"
                   value={trackData.name}
-                  onChange={(e) => setTrackData({...trackData, name: e.target.value})}
+                  onChange={(e) => setTrackData({ ...trackData, name: e.target.value })}
                   className="w-full p-3 rounded-lg focus:ring-2 focus:outline-none transition-all"
-                  style={{ 
+                  style={{
                     border: `1px solid ${COLORS.gray}80`,
                     backgroundColor: COLORS.white,
                   }}
                   placeholder="أدخل اسم المسار"
                   required
                 />
-                <div 
+                <div
                   className="absolute inset-y-0 left-0 w-1 rounded-l-lg"
                   style={{ backgroundColor: COLORS.blue }}
                 ></div>
@@ -286,16 +294,16 @@ const AddEduGat = () => {
                 <input
                   type="number"
                   value={trackData.numOfCourse}
-                  onChange={(e) => setTrackData({...trackData, numOfCourse: e.target.value})}
+                  onChange={(e) => setTrackData({ ...trackData, numOfCourse: e.target.value })}
                   className="w-full p-3 rounded-lg focus:ring-2 focus:outline-none transition-all"
-                  style={{ 
+                  style={{
                     border: `1px solid ${COLORS.gray}80`,
                     backgroundColor: COLORS.white,
                   }}
                   min="0"
                   required
                 />
-                <div 
+                <div
                   className="absolute inset-y-0 left-0 w-1 rounded-l-lg"
                   style={{ backgroundColor: COLORS.yellow }}
                 ></div>
@@ -309,16 +317,16 @@ const AddEduGat = () => {
               <div className="relative mt-1">
                 <textarea
                   value={trackData.description}
-                  onChange={(e) => setTrackData({...trackData, description: e.target.value})}
+                  onChange={(e) => setTrackData({ ...trackData, description: e.target.value })}
                   className="w-full p-3 rounded-lg focus:ring-2 focus:outline-none transition-all"
-                  style={{ 
+                  style={{
                     border: `1px solid ${COLORS.gray}80`,
                     backgroundColor: COLORS.white,
                   }}
                   rows="4"
                   placeholder="أدخل وصفًا للمسار"
                 />
-                <div 
+                <div
                   className="absolute inset-y-0 left-0 w-1 rounded-l-lg"
                   style={{ backgroundColor: COLORS.gray }}
                 ></div>
@@ -331,7 +339,7 @@ const AddEduGat = () => {
               type="submit"
               disabled={loading}
               className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all hover:shadow-lg font-medium"
-              style={{ 
+              style={{
                 backgroundColor: loading ? COLORS.gray : COLORS.blue,
                 color: COLORS.white
               }}
@@ -351,7 +359,7 @@ const AddEduGat = () => {
                 type="button"
                 onClick={resetForm}
                 className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all hover:shadow-lg font-medium"
-                style={{ 
+                style={{
                   backgroundColor: COLORS.gray,
                   color: COLORS.white
                 }}
@@ -381,12 +389,12 @@ const AddEduGat = () => {
             <p className="mt-4" style={{ color: COLORS.gray }}>جاري تحميل بيانات المسارات...</p>
           </div>
         ) : tracks.length === 0 ? (
-          <motion.div 
+          <motion.div
             className="text-center py-12 rounded-xl border-2 border-dashed"
-            style={{ 
+            style={{
               backgroundColor: COLORS.white,
               borderColor: COLORS.gray + '50',
-              color: COLORS.gray 
+              color: COLORS.gray
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -398,14 +406,16 @@ const AddEduGat = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {tracks.map((track) => (
+              
               <motion.div
-                key={track.id}
+              
+      key={track.id + '_' + track.createdAt} // إضافة معرّف إضافي لمنع التكرار
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="rounded-xl overflow-hidden shadow-md transition-all hover:shadow-lg"
                 style={{ backgroundColor: COLORS.white }}
               >
-                <div 
+                <div
                   className="p-4 cursor-pointer flex justify-between items-center"
                   onClick={() => toggleTrackDetails(track.id)}
                   style={{ backgroundColor: COLORS.gray + '10' }}
@@ -432,7 +442,7 @@ const AddEduGat = () => {
                         handleEdit(track);
                       }}
                       className="p-2 rounded-lg flex items-center gap-1 transition-all hover:bg-opacity-10"
-                      style={{ 
+                      style={{
                         backgroundColor: COLORS.blue + '20',
                         color: COLORS.blue
                       }}
@@ -440,7 +450,7 @@ const AddEduGat = () => {
                       <FiEdit3 />
                       <span className="hidden sm:inline">تعديل</span>
                     </button>
-                    <div 
+                    <div
                       className={`transform transition-transform ${expandedTrack === track.id ? 'rotate-180' : ''}`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style={{ color: COLORS.gray }}>
@@ -449,7 +459,7 @@ const AddEduGat = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <AnimatePresence>
                   {expandedTrack === track.id && (
                     <motion.div
@@ -467,7 +477,7 @@ const AddEduGat = () => {
                         <p className="text-sm" style={{ color: COLORS.gray }}>
                           {track.description || 'لا يوجد وصف للمسار'}
                         </p>
-                        
+
                         <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: COLORS.gray }}>
                           <FiUser />
                           <span>تم إنشاؤه بواسطة: {user?.username || 'مستخدم'}</span>
@@ -481,7 +491,7 @@ const AddEduGat = () => {
           </div>
         )}
       </div>
-      
+
       {/* إشعارات الهاتف */}
       <div className="fixed bottom-4 left-4 right-4 md:hidden">
         <AnimatePresence>
@@ -501,7 +511,7 @@ const AddEduGat = () => {
               </button>
             </motion.div>
           )}
-          
+
           {success && (
             <motion.div
               key="mobile-success"
