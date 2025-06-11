@@ -62,23 +62,26 @@ export default {
     }
   },
   
-  async update(ctx: Context) {
+   async update(ctx: Context) {
     const { id } = ctx.params;
     const { permissions } = ctx.request.body;
 
-    const formattedPermissions = permissions?.reduce((acc: Record<string, boolean>, perm: string) => {
-      acc[perm] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-
     try {
-      const updatedUser = await strapi.plugins['users-permissions'].services.user.edit(
-        { id },
-        { permissions: formattedPermissions }
+      // الحل: استخدام entityService بدلاً من users-permissions plugin
+      const updatedUser = await strapi.entityService.update(
+        'plugin::users-permissions.user',
+        id,
+        {
+          data: {
+            permissions: permissions
+          },
+          populate: ['role']
+        }
       );
+      
       return updatedUser;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
+      const message = err instanceof Error ? `فشل في تحديث المستخدم: ${err.message}` : 'فشل غير معروف';
       ctx.throw(500, message);
     }
   },
