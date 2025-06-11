@@ -110,7 +110,7 @@ const CourseCard = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onToggleFavorite(course.id);
+              onToggleFavorite(course.documentId);
             }}
             className="p-2 hover:bg-gray-100 rounded-full"
           >
@@ -191,20 +191,17 @@ const CoursesPage = () => {
         const [coursesRes, tracksRes] = await Promise.all([
           axios.get(`${API_URL}/courses`, {
             params: {
-              populate: {
-                coverImage: '*',
-                track: '*',
-                users_permissions_user: '*',
-                videos: '*',
-                entry_test: '*'
-              }
-            }
+    populate: '*' // تأكد من تضمين جميع الحقول
+  }
           }),
-          axios.get(`${API_URL}/tracks`)
-        ]);
+axios.get(`${API_URL}/tracks`, {
+  params: {
+    populate: '*' // تأكد من تضمين جميع الحقول
+  }
+})        ]);
 
         const formattedCourses = coursesRes.data.data.map(course => ({
-          id: course.id,
+          id: course.documentId,
           ...course,
           courseName: course.courseName || 'لا يوجد اسم',
 
@@ -218,7 +215,7 @@ const CoursesPage = () => {
 
         setCourses(formattedCourses);
        setTracks(tracksRes.data.data.map(track => ({
-  id: track.id,
+  id: track.documentId,
   name: track.name || 'غير محدد',
   numOfCourse: track.numOfCourse || 0
 }))); setLoading(false);
