@@ -42,7 +42,7 @@ import UsersPage from '../DashBoardHR/components/managmentTeam/page';
 
 const AdminDashboard = () => {
   // State management
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState();
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({});
   const [activityLogs, setActivityLogs] = useState([]);

@@ -1,4 +1,3 @@
-// components/courses/CourseManagement.jsx
 "use client";
 import React, { useState ,useEffect  } from "react";
 import CourseFormModal from "./CourseFormModal";
@@ -35,17 +34,17 @@ const CourseManagement = ({ initialCourses = [], onUpdate, onDelete }) => {
     setShowReviewModal(true);
   };
   useEffect(() => {
-  const fetchCourses = async () => {
-    try {
-      const data = await getStrapiData('/courses?populate=deep,3');
-      setCourses(data.data || []);
-    } catch (error) {
-      console.error("Failed to fetch courses:", error);
-    }
-  };
-
-  fetchCourses();
-}, []);
+    const fetchCourses = async () => {
+      try {
+        const data = await getStrapiData('/courses?populate=*');
+        setCourses(data.data || []);
+      } catch (error) {
+        console.error("فشل في جلب الدورات:", error);
+        alert("تعذر تحميل الدورات. يرجى المحاولة لاحقًا.");
+      }
+    };
+    fetchCourses();
+  }, []);
 useEffect(() => {
   const handleOpenShareForm = (e) => {
     const course = e.detail;
@@ -55,18 +54,28 @@ useEffect(() => {
   window.addEventListener('openShareForm', handleOpenShareForm);
   return () => window.removeEventListener('openShareForm', handleOpenShareForm);
 }, []);
- const handleApproveOrReject = async (courseId, reviewStatus, rejectionReason = "") => {
-  try {
-    const updatedCourse = await postStrapiData(`/api/courses/${courseId}`, {
-      reviewStatus,
-      rejectionReason
+ const handleApproveOrReject = async (documentId, reviewStatus, rejectionReason = "") => {
+   try {
+    const updatedCourse = await postStrapiData(`/courses/${documentId}`, {
+      data: {
+        reviewStatus,
+        rejectionReason
+      }
     });
+    setCourses(prev => prev.map(c => 
+      c.documentId === documentId ? { ...c, ...updatedCourse.data } : c
+    ));
+     const statusMessage = reviewStatus === "Approved" 
+      ? "تم قبول الدورة بنجاح" 
+      : reviewStatus === "Rejected" 
+        ? "تم رفض الدورة بنجاح" 
+        : "تم تحديث حالة الدورة";
     
-    onUpdate(updatedCourse);
+    toast.success(statusMessage);
     setShowReviewModal(false);
   } catch (error) {
     console.error("Error updating course status:", error);
-    alert("حدث خطأ أثناء تحديث حالة الدورة");
+    alert(error.message || "حدث خطأ أثناء تحديث حالة الدورة");
   }
 };
 
@@ -118,7 +127,7 @@ useEffect(() => {
           <tbody className="divide-y divide-gray-200">
             {filteredCourses.length > 0 ? (
               filteredCourses.map((course) => (
-                <tr key={course.id}>
+                <tr key={course.documentId}>
                   <td className="px-6 py-4">{course.courseName}</td>
                   <td className="px-6 py-4">
                     {course.users_permissions_user?.username || 'Unknown Instructor'}
@@ -163,7 +172,7 @@ useEffect(() => {
                       className="text-red-600 hover:text-red-800"
                       onClick={() => {
                         if (window.confirm("هل أنت متأكد من حذف هذه الدورة؟")) {
-                          onDelete(course.id);
+      onDelete(course.documentId);
                         }
                       }}
                     >
@@ -216,4 +225,4 @@ useEffect(() => {
   );
 };
 
-export default CourseManagement;
+export default CourseManagement; 

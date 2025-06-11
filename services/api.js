@@ -50,7 +50,15 @@ export default {
     api.get(
       `/tracks?filters[users_permissions_user][id][$eq]=${userId}&fields[0]=name&fields[1]=description&fields[2]=numOfCourse&fields[3]=createdAt`
     ),
-  createTrack: (data) => api.post("/tracks", data),
+  createTrack: (data) =>
+    api.post(
+      "/tracks",
+      { data },
+      {
+        // لف البيانات داخل { data }
+        headers: { "Content-Type": "application/json" },
+      }
+    ),
   updateTrack: (documentId, data) =>
     api.put(
       `/tracks/${documentId}`,
