@@ -121,7 +121,7 @@ const List = () => {
           {/* الإشعارات والرسائل */}
           {[
             { href: "./Navigation", text: t?.menu?.notifications, icon: <FiBell />, notification: true },
-            { href: "./Massage", text: t?.menu?.messages, icon: <FiMessageSquare /> },
+            { href: "./MassageChatStudent", text: t?.menu?.messages, icon: <FiMessageSquare /> },
           ].map((item, index) => (
             <motion.div key={index} variants={itemVariants}>
               <Link href={item.href} className={`flex items-center gap-4 p-3 rounded-xl hover:bg-purple-50/50 transition-all ${language === 'ar' ? 'flex-row-reverse' : ''}`}>

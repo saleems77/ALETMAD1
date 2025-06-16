@@ -1,4 +1,3 @@
-// components/Auth/Login.jsx
 "use client"
 import { useState ,useEffect } from 'react';
 import { AuthLayout } from './AuthLayout';
