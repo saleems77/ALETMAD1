@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "course_chats",
+  "info": {
+    "singularName": "course-chat",
+    "pluralName": "course-chats",
+    "displayName": "course-chat"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::course.course",
+      "mappedBy": "course_chat"
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "course_chat"
+    },
+    "messages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::message.message",
+      "mappedBy": "course_chat"
+    }
+  }
+}

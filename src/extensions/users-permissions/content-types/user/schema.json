@@ -11,6 +11,7 @@
   "options": {
     "draftAndPublish": false
   },
+  "pluginOptions": {},
   "attributes": {
     "username": {
       "type": "string",
@@ -94,6 +95,18 @@
     },
     "jobTitle": {
       "type": "string"
+    },
+    "course_chat": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course-chat.course-chat",
+      "inversedBy": "users_permissions_users"
+    },
+    "message": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::message.message",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

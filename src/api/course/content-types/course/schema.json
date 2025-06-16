@@ -10,6 +10,7 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "courseName": {
       "type": "string",
@@ -46,6 +47,11 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "courses"
     },
+    "participants": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user"
+    },
     "attachments": {
       "type": "media",
       "multiple": true,
@@ -65,8 +71,8 @@
     },
     "videos": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.videos"
+      "component": "shared.videos",
+      "repeatable": true
     },
     "learningObjectives": {
       "type": "text"
@@ -81,12 +87,12 @@
     },
     "reviewStatus": {
       "type": "enumeration",
+      "default": "\"Pending\"",
       "enum": [
         "\"Pending\"",
         "\"Approved\"",
         "\"Rejected\""
-      ],
-      "default": "\"Pending\""
+      ]
     },
     "rejectionReason": {
       "type": "string"
@@ -102,6 +108,12 @@
     "marketerShare": {
       "type": "decimal",
       "default": 10
+    },
+    "course_chat": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::course-chat.course-chat",
+      "inversedBy": "course"
     }
   }
 }
