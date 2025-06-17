@@ -777,6 +777,45 @@ export interface ApiInvitationLinkInvitationLink
   };
 }
 
+export interface ApiMarketerMarketer extends Struct.CollectionTypeSchema {
+  collectionName: 'marketers';
+  info: {
+    displayName: 'Marketer';
+    pluralName: 'marketers';
+    singularName: 'marketer';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    code: Schema.Attribute.UID;
+    commissionRate: Schema.Attribute.Decimal;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    earnings: Schema.Attribute.Decimal;
+    email: Schema.Attribute.Email;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::marketer.marketer'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    registrationDate: Schema.Attribute.Date;
+    statu: Schema.Attribute.Enumeration<['active', 'unactive']>;
+    totalSales: Schema.Attribute.Integer;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiMaterialMaterial extends Struct.CollectionTypeSchema {
   collectionName: 'materials';
   info: {
@@ -1410,6 +1449,7 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    marketers: Schema.Attribute.Relation<'oneToMany', 'api::marketer.marketer'>;
     message: Schema.Attribute.Relation<'oneToOne', 'api::message.message'>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
@@ -1459,6 +1499,7 @@ declare module '@strapi/strapi' {
       'api::entry-test.entry-test': ApiEntryTestEntryTest;
       'api::global.global': ApiGlobalGlobal;
       'api::invitation-link.invitation-link': ApiInvitationLinkInvitationLink;
+      'api::marketer.marketer': ApiMarketerMarketer;
       'api::material.material': ApiMaterialMaterial;
       'api::message.message': ApiMessageMessage;
       'api::question.question': ApiQuestionQuestion;

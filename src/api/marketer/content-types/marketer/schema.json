@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "marketers",
+  "info": {
+    "singularName": "marketer",
+    "pluralName": "marketers",
+    "displayName": "Marketer"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "code": {
+      "type": "uid"
+    },
+    "commissionRate": {
+      "type": "decimal"
+    },
+    "totalSales": {
+      "type": "integer"
+    },
+    "earnings": {
+      "type": "decimal"
+    },
+    "statu": {
+      "type": "enumeration",
+        "enum": ["active", "unactive"]
+
+    },
+    "registrationDate": {
+      "type": "date"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "marketers"
+    }
+  }
+}

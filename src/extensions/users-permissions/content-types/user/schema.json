@@ -107,6 +107,12 @@
       "relation": "oneToOne",
       "target": "api::message.message",
       "mappedBy": "users_permissions_user"
+    },
+    "marketers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::marketer.marketer",
+      "mappedBy": "users_permissions_user"
     }
   }
 }
