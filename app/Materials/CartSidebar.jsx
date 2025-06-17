@@ -1,6 +1,6 @@
 'use client';
 import { X } from 'lucide-react';
-import CheckoutModal from './CheckoutModal';
+import CheckoutModal from '../DashBoardTraier/components/CheckoutModal';
 import { useState } from 'react';
 export default function CartSidebar({ isOpen, onClose, cart, setCart }) {
   const [showCheckout, setShowCheckout] = useState(false);
