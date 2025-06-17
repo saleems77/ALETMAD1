@@ -541,6 +541,41 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
+  collectionName: 'coupons';
+  info: {
+    displayName: 'Coupon';
+    pluralName: 'coupons';
+    singularName: 'coupon';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    code: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    course: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    discount: Schema.Attribute.Decimal;
+    discountType: Schema.Attribute.Enumeration<['percentage, fixed']>;
+    expiresAt: Schema.Attribute.Date;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::coupon.coupon'
+    > &
+      Schema.Attribute.Private;
+    maxUses: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCourseChatCourseChat extends Struct.CollectionTypeSchema {
   collectionName: 'course_chats';
   info: {
@@ -592,6 +627,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'images' | 'files' | 'videos' | 'audios',
       true
     >;
+    coupon: Schema.Attribute.Relation<'oneToOne', 'api::coupon.coupon'>;
     course_chat: Schema.Attribute.Relation<
       'oneToOne',
       'api::course-chat.course-chat'
@@ -607,6 +643,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     >;
     hasEntryTest: Schema.Attribute.Boolean;
     instructorShare: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<70>;
+    invitation_link: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::invitation-link.invitation-link'
+    >;
     isFree: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     learningObjectives: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -700,6 +740,36 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     siteDescription: Schema.Attribute.Text & Schema.Attribute.Required;
     siteName: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiInvitationLinkInvitationLink
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'invitation_links';
+  info: {
+    displayName: 'InvitationLink';
+    pluralName: 'invitation-links';
+    singularName: 'invitation-link';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    course: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    linkCode: Schema.Attribute.UID;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::invitation-link.invitation-link'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1348,10 +1418,12 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
+      'api::coupon.coupon': ApiCouponCoupon;
       'api::course-chat.course-chat': ApiCourseChatCourseChat;
       'api::course.course': ApiCourseCourse;
       'api::entry-test.entry-test': ApiEntryTestEntryTest;
       'api::global.global': ApiGlobalGlobal;
+      'api::invitation-link.invitation-link': ApiInvitationLinkInvitationLink;
       'api::message.message': ApiMessageMessage;
       'api::question.question': ApiQuestionQuestion;
       'api::track.track': ApiTrackTrack;

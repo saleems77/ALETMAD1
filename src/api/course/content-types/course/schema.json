@@ -114,6 +114,18 @@
       "relation": "oneToOne",
       "target": "api::course-chat.course-chat",
       "inversedBy": "course"
+    },
+    "coupon": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::coupon.coupon",
+      "mappedBy": "course"
+    },
+    "invitation_link": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::invitation-link.invitation-link",
+      "mappedBy": "course"
     }
   }
 }

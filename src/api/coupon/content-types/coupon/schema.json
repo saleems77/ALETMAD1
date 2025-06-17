@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "coupons",
+  "info": {
+    "singularName": "coupon",
+    "pluralName": "coupons",
+    "displayName": "Coupon"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "expiresAt": {
+      "type": "date"
+    },
+    "discount": {
+      "type": "decimal"
+    },
+    "discountType": {
+      "type": "enumeration",
+      "enum": [
+        "percentage, fixed"
+      ]
+    },
+    "maxUses": {
+      "type": "integer"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::course.course",
+      "inversedBy": "coupon"
+    }
+  }
+}
