@@ -2,39 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-/* استخدم وحدات rem بدلاً من px */
-.button {
-  padding: 1rem 2rem; /* بدلاً من 16px 32px */
-  font-size: 1.125rem; /* بدلاً من 18px */
-}
-
 :root {
-    --font-main: 'Cairo', sans-serif;
+  /* الألوان الأساسية المطلوبة */
+  --blue: #008DCB;
+  --black: #0D1012;
+  --gray: #999999;
+  --red: #E2101E;
+  --yellow: #F9D011;
+  --white: #FFFFFF;
+  
+  /* تعريفات الخطوط */
+  --font-main: 'Cairo', sans-serif;
+  
+  /* تعريفات الثيم */
   --color-primary: #2563EB;
-  --primary: #2563EB; /* أزرق نابض */
-  --secondary: #10B981; /* أخضر فاتح */
-  --dark: #1E293B; /* رمادي داكن */
-  --light: #F8FAFC; /* أبيض نقي */
-  --gradient: linear-gradient(135deg, #2563EB, #10B981);
-  --border: #e5e7eb; /* قيمتك الأصلية هنا */
+  --primary: var(--blue); /* استخدام الأزرق المطلوب */
+  --secondary: #10B981;
+  --dark: #1E293B;
+  --light: #F8FAFC;
+  --gradient: linear-gradient(135deg, var(--blue), #10B981);
+  --border: #e5e7eb;
   --ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  /* نقل المتغيرات الخاصة بالثيم هنا */
+  --background: var(--white); /* استخدام الأبيض المطلوب */
+  --foreground: var(--black); /* استخدام الأسود المطلوب */
+  
+  /* نقل المتغيرات الخاصة بالثيم */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: var(--blue); /* استخدام الأزرق المطلوب */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -42,41 +45,44 @@
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
+  --destructive: var(--red); /* استخدام الأحمر المطلوب */
+  --border: var(--gray); /* استخدام الرمادي المطلوب */
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0 227.392);
   --chart-4: oklch(0.828 0 0);
   --chart-5: oklch(0.769 0 0);
+  
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: var(--blue); /* استخدام الأزرق المطلوب */
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-   --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif, 'Inter', 'Cairo';
-  font-family: var(--font-main);
-  font-size: 16px; /* حجم ثابت للبداية */
+  font-family: var(--font-main), Arial, Helvetica, sans-serif, 'Inter';
+  font-size: 16px;
+  background-color: var(--white); /* تطبيق اللون الأبيض */
+  color: var(--black); /* تطبيق اللون الأسود */
 }
 
 @layer base {
-
   .dark {
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -86,6 +92,13 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* الألوان في الوضع الداكن */
+    --background: var(--black);
+    --foreground: var(--white);
+    --primary: var(--blue);
+    --destructive: var(--red);
+    --border: var(--gray);
   }
 
   /* تنسيق المفتاح للتحويل */
@@ -109,7 +122,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--gray); /* استخدام الرمادي المطلوب */
     transition: .4s;
     border-radius: 34px;
   }
@@ -121,13 +134,13 @@ body {
     width: 20px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    background-color: var(--white); /* استخدام الأبيض المطلوب */
     transition: .4s;
     border-radius: 50%;
   }
 
   input:checked + .slider {
-    background-color: #3b82f6;
+    background-color: var(--blue); /* استخدام الأزرق المطلوب */
   }
 
   input:checked + .slider:before {
@@ -135,96 +148,88 @@ body {
   }
 }
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0 264.376);
-  --chart-2: oklch(0.696 0 162.48);
-  --chart-3: oklch(0.769 0 70.08);
-  --chart-4: oklch(0.627 0 303.9);
-  --chart-5: oklch(0.645 0 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
 /* تطبيق الخصائص المخصصة على جميع العناصر */
 @layer base {
   * {
-    @apply border-border outline-ring outline-opacity-50;
+    border-color: var(--border);
+    outline-color: var(--ring);
+    outline-opacity: 0.5;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  
+  /* تطبيق الألوان على العناصر الشائعة */
+  button, .btn {
+    background-color: var(--blue);
+    color: var(--white);
+    border-color: var(--blue);
+  }
+  
+  button:hover, .btn:hover {
+    background-color: var(--blue);
+    opacity: 0.9;
+  }
+  
+  .bg-blue {
+    background-color: var(--blue);
+  }
+  
+  .bg-red {
+    background-color: var(--red);
+  }
+  
+  .bg-yellow {
+    background-color: var(--yellow);
+  }
+  
+  .bg-gray {
+    background-color: var(--gray);
+  }
+  
+  .text-blue {
+    color: var(--blue);
+  }
+  
+  .text-red {
+    color: var(--red);
+  }
+  
+  .text-yellow {
+    color: var(--yellow);
+  }
+  
+  .text-gray {
+    color: var(--gray);
+  }
+  
+  .border-blue {
+    border-color: var(--blue);
+  }
+  
+  .border-red {
+    border-color: var(--red);
+  }
+  
+  .border-yellow {
+    border-color: var(--yellow);
+  }
+  
+  .border-gray {
+    border-color: var(--gray);
   }
 }
 
 /* التنسيقات الخاصة بمحرر النصوص */
 .ql-toolbar.ql-snow {
-  border: 1px solid #e5e7eb !important;
+  border: 1px solid var(--border) !important;
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .ql-container.ql-snow {
-  border: 1px solid #e5e7eb !important;
+  border: 1px solid var(--border) !important;
   border-radius: 0 0 0.5rem 0.5rem;
   height: 384px;
 }
@@ -236,24 +241,49 @@ body {
   text-align: right;
 }
 
-/* تأكد من عدم تكرار تطبيق الخصائص مرتين */
-/* يمكنك حذف النسخة الزائدة إذا رغبت */
-
 /* تعريف الكلاسات المخصصة داخل @layer utilities */
 @layer utilities {
   .outline-ring {
     outline-color: var(--ring);
   }
+  
   .outline-opacity-50 {
     outline-opacity: 0.5;
   }
+  
   .drop-shadow-logo {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   }
+  
   .shadow-header {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
+  
+  /* تطبيق الألوان على التحميل */
+  .animate-spin {
+    border-top-color: var(--blue);
+    border-right-color: var(--blue);
+    border-bottom-color: var(--blue);
+    border-left-color: transparent;
+  }
+  
+  /* تطبيق الألوان على التنبيهات */
+  .toast-success {
+    background-color: var(--blue);
+    color: var(--white);
+  }
+  
+  .toast-error {
+    background-color: var(--red);
+    color: var(--white);
+  }
+  
+  .toast-warning {
+    background-color: var(--yellow);
+    color: var(--black);
+  }
 }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

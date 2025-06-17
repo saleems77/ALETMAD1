@@ -1,51 +1,51 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { getCoupons } from '../../../../services/couponData';
-import qs from 'qs';
-import { FaSearch, FaCopy, FaTag, FaTimes } from 'react-icons/fa';
+import { getInvitationLinks } from '../../../../services/couponData';
+import { FaSearch, FaCopy, FaLink, FaTimes } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 
-const CouponList = ({ courseDocumentId }) => {
-  const [coupons, setCoupons] = useState([]);
+const InvitationLinkList = ({ courseDocumentId }) => {
+  const [links, setLinks] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredCoupons, setFilteredCoupons] = useState([]);
+  const [filteredLinks, setFilteredLinks] = useState([]);
 
   useEffect(() => {
-    const fetchCoupons = async () => {
+    const fetchLinks = async () => {
       setIsLoading(true);
       try {
-        const couponsData = await getCoupons(courseDocumentId);
-        setCoupons(couponsData);
-        setFilteredCoupons(couponsData);
+        const linksData = await getInvitationLinks(courseDocumentId);
+        setLinks(linksData);
+        setFilteredLinks(linksData);
       } catch (error) {
-        console.error('فشل جلب الكوبونات:', error);
-        setCoupons([]);
-        setFilteredCoupons([]);
+        console.error('فشل جلب روابط الدعوة:', error);
+        setLinks([]);
+        setFilteredLinks([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     if (courseDocumentId) {
-      fetchCoupons();
+      fetchLinks();
     }
   }, [courseDocumentId]);
 
   useEffect(() => {
     if (searchTerm === '') {
-      setFilteredCoupons(coupons);
+      setFilteredLinks(links);
     } else {
-      const filtered = coupons.filter(coupon =>
-        coupon?.code?.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = links.filter(link =>
+        link?.linkCode?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredCoupons(filtered);
+      setFilteredLinks(filtered);
     }
-  }, [searchTerm, coupons]);
+  }, [searchTerm, links]);
 
-  const handleCopy = (code) => {
-    navigator.clipboard.writeText(code);
-    toast.success('تم نسخ الكود', {
+  const handleCopy = (linkCode) => {
+    const fullLink = `${window.location.origin}/join?code=${linkCode}`;
+    navigator.clipboard.writeText(fullLink);
+    toast.success('تم نسخ الرابط', {
       icon: '📋',
       style: {
         background: '#f0fdf4',
@@ -56,12 +56,12 @@ const CouponList = ({ courseDocumentId }) => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
+    <div>
+      <div className="mb-4">
         <div className="relative">
           <input
             type="text"
-            placeholder="ابحث عن كوبون..."
+            placeholder="ابحث عن رابط دعوة..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 pr-10 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
@@ -81,16 +81,16 @@ const CouponList = ({ courseDocumentId }) => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-600">جاري تحميل الكوبونات...</p>
+          <p className="text-gray-600">جاري تحميل روابط الدعوة...</p>
         </div>
-      ) : filteredCoupons.length === 0 ? (
+      ) : filteredLinks.length === 0 ? (
         <div className="text-center py-8">
           <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaTag className="text-gray-400 text-2xl" />
+            <FaLink className="text-gray-400 text-2xl" />
           </div>
-          <h3 className="text-lg font-medium text-gray-800 mb-2">لا توجد كوبونات</h3>
+          <h3 className="text-lg font-medium text-gray-800 mb-2">لا توجد روابط دعوة</h3>
           <p className="text-gray-600">
-            {searchTerm ? 'لم يتم العثور على كوبونات مطابقة للبحث' : 'لم يتم إنشاء أي كوبونات لهذه الدورة بعد'}
+            {searchTerm ? 'لم يتم العثور على روابط دعوة مطابقة للبحث' : 'لم يتم إنشاء أي روابط دعوة لهذه الدورة بعد'}
           </p>
         </div>
       ) : (
@@ -99,40 +99,26 @@ const CouponList = ({ courseDocumentId }) => {
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  رمز الكوبون
+                  كود الرابط
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  الخصم
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  تاريخ الانتهاء
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  نسخ
+                  نسخ الرابط
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCoupons.map(coupon => (
-                <tr key={coupon.id} className="hover:bg-gray-50 transition-colors">
+              {filteredLinks.map(link => (
+                <tr key={link.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center justify-end">
                       <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-mono">
-                        {coupon.code}
+                        {link.linkCode}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                      {coupon.discount}%
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-gray-500">
-                    {new Date(coupon.expiresAt).toLocaleDateString('ar-EG')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
                     <button 
-                      onClick={() => handleCopy(coupon.code)}
+                      onClick={() => handleCopy(link.linkCode)}
                       className="text-gray-400 hover:text-blue-500 p-2 rounded-full hover:bg-blue-50 transition-colors"
                     >
                       <FaCopy />
@@ -145,13 +131,13 @@ const CouponList = ({ courseDocumentId }) => {
         </div>
       )}
       
-      {filteredCoupons.length > 0 && (
+      {filteredLinks.length > 0 && (
         <div className="mt-4 text-sm text-gray-500">
-          عرض {filteredCoupons.length} من {coupons.length} كوبون
+          عرض {filteredLinks.length} من {links.length} رابط دعوة
         </div>
       )}
     </div>
   );
 };
 
-export default CouponList;
+export default InvitationLinkList;
