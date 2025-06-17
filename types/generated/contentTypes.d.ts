@@ -656,6 +656,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     marketerShare: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<10>;
+    materials: Schema.Attribute.Relation<'oneToMany', 'api::material.material'>;
     participants: Schema.Attribute.Relation<
       'manyToMany',
       'plugin::users-permissions.user'
@@ -769,6 +770,40 @@ export interface ApiInvitationLinkInvitationLink
       'api::invitation-link.invitation-link'
     > &
       Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMaterialMaterial extends Struct.CollectionTypeSchema {
+  collectionName: 'materials';
+  info: {
+    displayName: 'Material';
+    pluralName: 'materials';
+    singularName: 'material';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    attachment: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::material.material'
+    > &
+      Schema.Attribute.Private;
+    price: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1424,6 +1459,7 @@ declare module '@strapi/strapi' {
       'api::entry-test.entry-test': ApiEntryTestEntryTest;
       'api::global.global': ApiGlobalGlobal;
       'api::invitation-link.invitation-link': ApiInvitationLinkInvitationLink;
+      'api::material.material': ApiMaterialMaterial;
       'api::message.message': ApiMessageMessage;
       'api::question.question': ApiQuestionQuestion;
       'api::track.track': ApiTrackTrack;

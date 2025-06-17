@@ -126,6 +126,12 @@
       "relation": "oneToOne",
       "target": "api::invitation-link.invitation-link",
       "mappedBy": "course"
+    },
+    "materials": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::material.material",
+      "mappedBy": "course"
     }
   }
 }
