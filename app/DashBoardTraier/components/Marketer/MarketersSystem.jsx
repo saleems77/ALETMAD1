@@ -105,7 +105,7 @@ const MarketersSystem = () => {
   const itemsPerPage = 5;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+  const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
 
   // جلب المسوقين من Strapi
   useEffect(() => {
@@ -113,7 +113,7 @@ const MarketersSystem = () => {
             const token = localStorage.getItem('jwt');
 
       try {
-        const response = await axios.get(`${API_URL}/api/marketers`, {
+        const response = await axios.get(`${API_URL}/marketers`, {
           headers: {
           Authorization: `Bearer ${token}`,
           },
@@ -163,7 +163,7 @@ const MarketersSystem = () => {
 
   try {
     // جلب المستخدم الحالي
-    const currentUserResponse = await axios.get(`${API_URL}/api/users/me`, {
+    const currentUserResponse = await axios.get(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -171,7 +171,7 @@ const MarketersSystem = () => {
 
     // إرسال البيانات إلى Strapi
     const response = await axios.post(
-      `${API_URL}/api/marketers`,
+      `${API_URL}/marketers`,
       {
         data: {
           name: state.formData.name,
@@ -215,7 +215,7 @@ const MarketersSystem = () => {
 
   try {
     // إرسال طلب الحذف إلى Strapi باستخدام documentId
-    const response = await axios.delete(`${API_URL}/api/marketers/${documentId}`, {
+    const response = await axios.delete(`${API_URL}/marketers/${documentId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
