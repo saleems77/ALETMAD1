@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Link from 'next/link';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   FiUpload,
   FiPaperclip,
@@ -40,16 +41,10 @@ const COLORS = {
   success: "#28A745"
 };
 
-// أنواع التنبيهات
-const ALERT_TYPES = {
-  ERROR: 'error',
-  SUCCESS: 'success'
-};
-
 // تحديث مصفوفة الخطوات لإضافة خطوة جديدة
 const STEPS = [
   { id: 1, title: "المعلومات الأساسية", icon: <FiBook /> },
-  { id: 2, title: "صورة الغلف", icon: <FiImage /> }, // خطوة جديدة
+  { id: 2, title: "صورة الغلف", icon: <FiImage /> },
   { id: 3, title: "الأهداف التعليمية", icon: <FiTarget /> },
   { id: 4, title: "المتطلبات", icon: <FiList /> },
   { id: 5, title: "الفئة المستهدفة", icon: <FiUsers /> },
@@ -67,15 +62,12 @@ const AddCourseComponent = () => {
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
-  const [isProcessingVideo, setIsProcessingVideo] = useState(false); // حالة معالجة الفيديو
-  
-  // حالة الرسائل التنبيهية
-  const [alert, setAlert] = useState(null);
+  const [isProcessingVideo, setIsProcessingVideo] = useState(false);
   
   const [formData, setFormData] = useState({
     courseName: "",
     track: null,
-    coverImage: null, // حقل جديد لصورة الغلف
+    coverImage: null,
     learningObjectives: "",
     requirements: "",
     targetAudience: "",
@@ -93,7 +85,7 @@ const AddCourseComponent = () => {
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
+  const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
 
   // تنظيف الموارد عند إلغاء تثبيت المكون
   useEffect(() => {
@@ -114,8 +106,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         }
       } catch (error) {
         if (isMounted.current) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "فشل في تحميل الفئات التعليمية",
             "تعذر تحميل الفئات من الخادم",
             "يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني"
@@ -130,18 +121,49 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     fetchTracks();
   }, []);
 
-  // إعدادات التنبيهات
-  const showAlert = (type, message, cause, solution) => {
-    if (!isMounted.current) return;
-    
-    setAlert({ type, message, cause, solution });
-    
-    // إخفاء التنبيه بعد 5 ثوانٍ
-    setTimeout(() => {
-      if (isMounted.current) {
-        setAlert(null);
-      }
-    }, 5000);
+  // إظهار تنبيهات الخطأ
+  const showErrorToast = (message, cause, solution) => {
+    toast.custom((t) => (
+      <motion.div
+        className="p-4 rounded-lg flex flex-col gap-2 shadow-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        style={{
+          backgroundColor: `${COLORS.danger}10`,
+          color: COLORS.danger,
+          borderLeft: `4px solid ${COLORS.danger}`,
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <FiAlertCircle className="text-xl mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="font-medium">{message}</p>
+            <p className="text-sm mt-1"><strong>السبب:</strong> {cause}</p>
+            <p className="text-sm mt-1"><strong>الحل:</strong> {solution}</p>
+          </div>
+          <button 
+            onClick={() => toast.dismiss(t.id)}
+            className="text-current hover:text-opacity-80"
+          >
+            <FiX />
+          </button>
+        </div>
+      </motion.div>
+    ), { duration: 5000 });
+  };
+
+  // إظهار تنبيهات النجاح
+  const showSuccessToast = (message) => {
+    toast.success(message, { 
+      duration: 3000,
+      style: {
+        backgroundColor: `${COLORS.success}10`,
+        color: COLORS.success,
+        borderLeft: `4px solid ${COLORS.success}`,
+      },
+      icon: <FiCheckCircle className="text-success" />,
+    });
   };
 
   // التحقق من صحة الخطوة مع إنشاء رسائل خطأ مفصلة
@@ -149,8 +171,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     switch (step) {
       case 1:
         if (!formData.courseName) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "اسم الدورة مطلوب",
             "لم يتم إدخال اسم الدورة التعليمية",
             "يرجى إدخال اسم الدورة في الحقل المخصص"
@@ -158,8 +179,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
           return false;
         }
         if (!formData.track?.id) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "الفئة التعليمية مطلوبة",
             "لم يتم اختيار الفئة التعليمية للدورة",
             "يرجى اختيار الفئة المناسبة من القائمة المنسدلة"
@@ -170,8 +190,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         
       case 2:
         if (!formData.coverImage) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "صورة الغلف مطلوبة",
             "لم يتم رفع صورة الغلف للدورة",
             "يرجى رفع صورة مناسبة بتنسيق JPEG/PNG/WEBP"
@@ -182,8 +201,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         
       case 3:
         if (!formData.learningObjectives.trim()) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "الأهداف التعليمية مطلوبة",
             "لم يتم إدخال الأهداف التعليمية للدورة",
             "يرجى كتابة الأهداف التعليمية الرئيسية في الحقل المخصص"
@@ -194,8 +212,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         
       case 6:
         if (!formData.isFree && formData.price <= 0) {
-          showAlert(
-            ALERT_TYPES.ERROR,
+          showErrorToast(
             "سعر غير صالح",
             "السعر يجب أن يكون أكبر من الصفر للدورات المدفوعة",
             "يرجى إدخال سعر صحيح أو تحديد أن الدورة مجانية"
@@ -206,11 +223,6 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     }
     return true;
   };
-
-  // إخفاء التنبيه عند تغيير الخطوة
-  useEffect(() => {
-    setAlert(null);
-  }, [activeStep]);
 
   // التالي
   const handleNext = () => {
@@ -235,8 +247,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
       (file) => !allowedTypes.includes(file.type)
     );
     if (invalidFiles.length > 0) {
-      showAlert(
-        ALERT_TYPES.ERROR,
+      showErrorToast(
         "ملفات غير مدعومة",
         "تم اختيار ملفات بتنسيقات غير مسموح بها",
         "يرجى رفع ملفات بصيغة PDF, DOC, DOCX, JPG, أو PNG فقط"
@@ -248,8 +259,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     const maxSize = 5 * 1024 * 1024;
     const largeFiles = files.filter((file) => file.size > maxSize);
     if (largeFiles.length > 0) {
-      showAlert(
-        ALERT_TYPES.ERROR,
+      showErrorToast(
         "حجم الملف كبير جداً",
         "بعض الملفات تتجاوز الحد الأقصى المسموح (5MB)",
         "يرجى رفع ملفات أصغر من 5MB"
@@ -287,12 +297,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
             ],
           }));
           
-          showAlert(
-            ALERT_TYPES.SUCCESS,
-            "تم رفع الملفات بنجاح",
-            "تم رفع جميع الملفات المختارة",
-            "يمكنك متابعة الخطوة التالية"
-          );
+          showSuccessToast("تم رفع الملفات بنجاح");
         }
       } else {
         throw new Error("فشل في رفع الملفات");
@@ -325,12 +330,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         }
       }
       
-      showAlert(
-        ALERT_TYPES.ERROR,
-        errorMessage,
-        errorCause,
-        errorSolution
-      );
+      showErrorToast(errorMessage, errorCause, errorSolution);
     } finally {
       if (isMounted.current) {
         setIsUploadingAttachments(false);
@@ -346,8 +346,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     // التحقق من نوع الملف
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      showAlert(
-        ALERT_TYPES.ERROR,
+      showErrorToast(
         "نوع الصورة غير مدعوم",
         "الصيغة غير مدعومة",
         "يرجى رفع صورة بتنسيق JPEG, PNG, أو WEBP"
@@ -358,8 +357,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     // التحقق من الحجم (5MB كحد أقصى)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      showAlert(
-        ALERT_TYPES.ERROR,
+      showErrorToast(
         "الحجم الأقصى للصورة 5MB",
         "الصورة تتجاوز الحد الأقصى المسموح",
         "يرجى رفع صورة أصغر من 5MB"
@@ -398,12 +396,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
           };
           reader.readAsDataURL(file);
           
-          showAlert(
-            ALERT_TYPES.SUCCESS,
-            "تم رفع صورة الغلف بنجاح",
-            "تم رفع صورة الغلف بنجاح",
-            "يمكنك متابعة الخطوة التالية"
-          );
+          showSuccessToast("تم رفع صورة الغلف بنجاح");
         }
       }
     } catch (error) {
@@ -429,12 +422,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         }
       }
       
-      showAlert(
-        ALERT_TYPES.ERROR,
-        errorMessage,
-        errorCause,
-        errorSolution
-      );
+      showErrorToast(errorMessage, errorCause, errorSolution);
     } finally {
       if (isMounted.current) {
         setIsUploadingCover(false);
@@ -476,12 +464,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         errorCause = error.response.data?.error?.message || errorCause;
       }
       
-      showAlert(
-        ALERT_TYPES.ERROR,
-        errorMessage,
-        errorCause,
-        errorSolution
-      );
+      showErrorToast(errorMessage, errorCause, errorSolution);
       throw error;
     } finally {
       if (isMounted.current) {
@@ -520,12 +503,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
           newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
         }));
         
-        showAlert(
-          ALERT_TYPES.SUCCESS,
-          "تم رفع الفيديو بنجاح",
-          "تم رفع الفيديو المحدد",
-          "يمكنك متابعة الخطوة التالية"
-        );
+        showSuccessToast("تم رفع الفيديو بنجاح");
       }
     } catch (error) {
       let errorMessage = "فشل في رفع الفيديو";
@@ -537,12 +515,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         errorCause = error.response.data?.error?.message || errorCause;
       }
       
-      showAlert(
-        ALERT_TYPES.ERROR,
-        errorMessage,
-        errorCause,
-        errorSolution
-      );
+      showErrorToast(errorMessage, errorCause, errorSolution);
     } finally {
       if (isMounted.current) {
         setIsUploadingVideo(false);
@@ -575,8 +548,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
     
     const jwt = localStorage.getItem('jwt');
     if (!jwt) {
-      showAlert(
-        ALERT_TYPES.ERROR,
+      showErrorToast(
         "يرجى تسجيل الدخول أولاً",
         "لا يمكنك إرسال النموذج دون تسجيل الدخول",
         "يرجى تسجيل الدخول قبل إرسال الدورة"
@@ -621,31 +593,66 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
       );
       
       if (isMounted.current) {
-        showAlert(
-          ALERT_TYPES.SUCCESS,
-          "تم إنشاء الدورة بنجاح!",
-          "تم حفظ الدورة بنجاح",
-          "يمكنك الانتقال إلى الدورة الجديدة الآن"
-        );
-        
-        // إعادة تعيين النموذج
-        setFormData({
-          courseName: '',
-          track: null,
-          coverImage: null,
-          learningObjectives: '',
-          requirements: '',
-          targetAudience: '',
-          price: 0,
-          isFree: true,
-          accessInstructions: '',
-          hasEntryTest: false,
-          attachments: [],
-          videos: [],
-          newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
-        });
-        setCoverImagePreview(null);
-        setActiveStep(1);
+        toast.custom((t) => (
+          <motion.div
+            className="p-4 rounded-lg flex flex-col gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              background: `${COLORS.success}10`,
+              color: COLORS.success,
+              borderLeft: `4px solid ${COLORS.success}`,
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <FiCheckCircle className="text-xl mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium">تم إنشاء الدورة بنجاح!</p>
+                <p className="text-sm mt-1"><strong>السبب:</strong> تم حفظ الدورة بنجاح</p>
+                <p className="text-sm mt-1"><strong>الحل:</strong> سيتم إعادة تعيين النموذج عند الضغط على موافق</p>
+              </div>
+              <button 
+                onClick={() => toast.dismiss(t.id)}
+                className="text-current hover:text-opacity-80"
+              >
+                <FiX />
+              </button>
+            </div>
+            <motion.button
+              className="mt-2 py-2 px-4 rounded-lg self-end"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                background: COLORS.primary,
+                color: COLORS.background
+              }}
+              onClick={() => {
+                // إعادة تعيين النموذج عند الضغط على موافق
+                setFormData({
+                  courseName: '',
+                  track: null,
+                  coverImage: null,
+                  learningObjectives: '',
+                  requirements: '',
+                  targetAudience: '',
+                  price: 0,
+                  isFree: true,
+                  accessInstructions: '',
+                  hasEntryTest: false,
+                  attachments: [],
+                  videos: [],
+                  newVideo: { title: '', file: null, duration: '', fileName: '', fileSize: '' },
+                });
+                setError('');
+                toast.dismiss(t.id);
+                setCoverImagePreview(null);
+                setActiveStep(1);
+              }}
+            >
+              موافق
+            </motion.button>
+          </motion.div>
+        ), { duration: 10000 });
       }
     } catch (error) {
       let errorMessage = "فشل في إرسال النموذج";
@@ -657,12 +664,7 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         errorCause = error.response.data?.error?.message || errorCause;
       }
       
-      showAlert(
-        ALERT_TYPES.ERROR,
-        errorMessage,
-        errorCause,
-        errorSolution
-      );
+      showErrorToast(errorMessage, errorCause, errorSolution);
     } finally {
       if (isMounted.current) {
         setIsSubmitting(false);
@@ -711,13 +713,13 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
         ))}
         <div className="absolute top-6 left-0 right-0 h-1 bg-gray-100 mx-6">
           <motion.div
-  className="h-full bg-primary"
-  initial={{ width: 0 }}
-  animate={{
-    width: `${progressWidth}%`,
-  }}
-  transition={{ duration: 0.5 }}
-/>
+            className="h-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{
+              width: `${progressWidth}%`,
+            }}
+            transition={{ duration: 0.5 }}
+          />
         </div>
       </div>
     </div>
@@ -786,47 +788,6 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
       </div>
     );
   };
-
-  // عرض رسالة التنبيه
-  const AlertMessage = () => {
-  if (!alert) return null;
-  
-  return (
-    <motion.div
-      className="mb-6 p-4 rounded-lg"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      style={{
-        background: (alert.type === ALERT_TYPES.ERROR)
-          ? `${COLORS.danger}10`
-          : `${COLORS.success}10`,
-        color: (alert.type === ALERT_TYPES.ERROR)
-          ? COLORS.danger
-          : COLORS.success,
-        borderLeft: `4px solid ${(alert.type === ALERT_TYPES.ERROR) ? COLORS.danger : COLORS.success}`
-      }}
-    >
-      <div className="flex items-start gap-3">
-        {alert.type === ALERT_TYPES.ERROR ? (
-          <FiAlertCircle className="text-xl mt-0.5 flex-shrink-0" />
-        ) : (
-          <FiCheckCircle className="text-xl mt-0.5 flex-shrink-0" />
-        )}
-        <div className="flex-1">
-          <p className="font-medium">{alert.message}</p>
-          <p className="text-sm mt-1"><strong>السبب:</strong> {alert.cause}</p>
-          <p className="text-sm mt-1"><strong>الحل:</strong> {alert.solution}</p>
-        </div>
-        <button 
-          onClick={() => setAlert(null)}
-          className="text-current hover:text-opacity-80"
-        >
-          <FiX />
-        </button>
-      </div>
-    </motion.div>
-  );
-};
 
   // محتوى الخطوات
   const StepContent = () => {
@@ -1387,6 +1348,18 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
       className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8"
       style={{ background: COLORS.background }}
     >
+      <Toaster
+        position="top-right"
+        containerStyle={{
+          zIndex: 10000,
+          direction: 'rtl',
+          fontFamily: 'inherit'
+        }}
+        toastOptions={{
+          duration: 5000,
+        }}
+      />
+      
       <motion.div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -1405,7 +1378,6 @@ const progressWidth = ((activeStep - 1) / (STEPS.length - 1)) * 100;
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
               >
-                <AlertMessage />
                 <StepContent />
               </motion.div>
             </AnimatePresence>
