@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Info, ChevronDown, AlertCircle, ArrowUpRight, Clock } from 'lucide-react';
@@ -7,7 +7,65 @@ import { Info, ChevronDown, AlertCircle, ArrowUpRight, Clock } from 'lucide-reac
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const AdPerformanceChart = ({ data }) => {
-  // نظام الألوان المحدد
+  const [chartData, setChartData] = useState(null);
+  
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+    
+    // نظام الألوان المحدد
+    const colors = {
+      blue: '#008DCB',
+      black: '#0D1012',
+      gray: '#999999',
+      red: '#E2101E',
+      white: '#FFFFFF',
+      yellow: '#F9D011'
+    };
+    
+    const chartConfig = {
+      labels: data.map(d => new Date(d.date).toLocaleDateString('ar-SA')),
+      datasets: [
+        {
+          label: 'الزيارات',
+          data: data.map(d => d.views),
+          borderColor: colors.blue,
+          backgroundColor: `${colors.blue}20`,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointBackgroundColor: colors.blue
+        },
+        {
+          label: 'التحويلات',
+          data: data.map(d => d.conversions),
+          borderColor: colors.yellow,
+          backgroundColor: `${colors.yellow}20`,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointBackgroundColor: colors.yellow
+        }
+      ]
+    };
+    
+    setChartData(chartConfig);
+  }, [data]);
+
+  if (!chartData) {
+    return (
+      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 h-[600px] flex items-center justify-center">
+        <div className="text-center">
+          <Info className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <p className="text-gray-500">جارٍ تحميل بيانات الأداء...</p>
+        </div>
+      </div>
+    );
+  }
+
   const colors = {
     blue: '#008DCB',
     black: '#0D1012',
@@ -15,47 +73,6 @@ const AdPerformanceChart = ({ data }) => {
     red: '#E2101E',
     white: '#FFFFFF',
     yellow: '#F9D011'
-  };
-
-  // بيانات الرسم البياني مع تحسينات التصميم
-  const chartData = {
-    labels: data.map(d => new Date(d.date).toLocaleDateString('ar-SA')),
-    datasets: [
-      {
-        label: 'الزيارات',
-        data: data.map(d => d.views),
-        borderColor: colors.blue,
-        backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-          gradient.addColorStop(0, `${colors.blue}20`);
-          gradient.addColorStop(1, `${colors.blue}02`);
-          return gradient;
-        },
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        pointBackgroundColor: colors.blue
-      },
-      {
-        label: 'التحويلات',
-        data: data.map(d => d.conversions),
-        borderColor: colors.yellow,
-        backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-          gradient.addColorStop(0, `${colors.yellow}20`);
-          gradient.addColorStop(1, `${colors.yellow}02`);
-          return gradient;
-        },
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        pointBackgroundColor: colors.yellow
-      }
-    ]
   };
 
   // إعدادات الرسم البياني المحسنة
@@ -72,7 +89,6 @@ const AdPerformanceChart = ({ data }) => {
         rtl: true,
         labels: {
           font: {
-            family: 'Noto Sans Arabic',
             size: 14
           },
           color: colors.black,
@@ -83,11 +99,9 @@ const AdPerformanceChart = ({ data }) => {
       tooltip: {
         rtl: true,
         bodyFont: {
-          family: 'Noto Sans Arabic',
           size: 14
         },
         titleFont: {
-          family: 'Noto Sans Arabic',
           size: 16
         },
         backgroundColor: colors.white,
@@ -106,7 +120,6 @@ const AdPerformanceChart = ({ data }) => {
         },
         ticks: {
           font: {
-            family: 'Noto Sans Arabic',
             size: 12
           },
           color: colors.gray
@@ -120,7 +133,6 @@ const AdPerformanceChart = ({ data }) => {
         ticks: {
           color: colors.gray,
           font: {
-            family: 'Noto Sans Arabic',
             size: 12
           },
           callback: (value) => value.toLocaleString('ar-EG')
@@ -130,7 +142,7 @@ const AdPerformanceChart = ({ data }) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100" 
+    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200" 
          style={{backgroundColor: colors.white}}>
       
       {/* Header Section */}
@@ -167,7 +179,7 @@ const AdPerformanceChart = ({ data }) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <StatCard 
           title="إجمالي الزيارات" 
-          value="245,800" 
+          value={data.reduce((sum, d) => sum + d.views, 0).toLocaleString()} 
           trend="+12.5%" 
           color={colors.blue}
           icon={<ArrowUpRight size={18} />}
@@ -214,14 +226,16 @@ const StatCard = ({ title, value, trend, color, icon }) => {
     <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm mb-1" style={{color: '#999999'}}>{title}</p>
+          <p className="text-sm mb-1 text-gray-500">{title}</p>
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold" style={{color: '#0D1012'}}>
+            <span className="text-2xl font-bold text-gray-900">
               {value}
             </span>
             {trend && (
-              <span className="text-sm flex items-center gap-1" 
-                    style={{color: trend.startsWith('+') ? '#008DCB' : '#E2101E'}}>
+              <span 
+                className="text-sm flex items-center gap-1" 
+                style={{color: trend.startsWith('+') ? '#008DCB' : '#E2101E'}}
+              >
                 {icon}
                 {trend}
               </span>

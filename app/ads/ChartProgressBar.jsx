@@ -4,13 +4,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const ChartProgressBar = ({ data }) => {
-  // حساب إحصائيات الأداء
   const totalViews = data?.reduce((acc, curr) => acc + curr.views, 0) || 0;
   const totalConversions = data?.reduce((acc, curr) => acc + curr.conversions, 0) || 0;
-  const conversionRate = totalViews > 0 
-    ? ((totalConversions / totalViews) * 100).toFixed(1)
-    : 0;
-
+  const conversionRate = totalViews > 0 ? ((totalConversions / totalViews) * 100).toFixed(1) : 0;
+  
   return (
     <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-gray-200">
       <div className="space-y-3">
@@ -25,7 +22,7 @@ const ChartProgressBar = ({ data }) => {
           transition={{ duration: 0.8 }}
           className="h-2 bg-blue-100 rounded-full overflow-hidden"
         >
-          <div className="h-full bg-blue-600 rounded-full transition-all duration-500" />
+          <div className="h-full bg-blue-600 rounded-full transition-all duration-500" style={{ width: `${conversionRate}%` }} />
         </motion.div>
         
         <div className="grid grid-cols-2 gap-4 text-sm">

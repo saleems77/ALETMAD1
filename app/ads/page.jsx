@@ -1,29 +1,25 @@
 "use client"
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdCampaignManager from './AdCampaignManager';
 import PromotedCourseBanner from './PromotedCourseBanner';
 import AdPerformanceChart from './AdPerformanceChart';
-import { Toast } from '@/components/ui/Toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/Skeletonn';
 import { Button } from '@/components/ui/Buttonn';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/Dialog';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toastt';
 import { BarChart4, Plus, Filter, Settings } from 'lucide-react';
+import StatCard from './StatCard';
+import ProtectedRoute from '../DashBoardAdmin/components/ProtectedRoute';
 
 const AdminAdsPage = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [selectedTab, setSelectedTab] = useState('active');
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  const { toast } = useToast();
   const campaignFormRef = useRef(null);
-
-  const courses = [
-    { id: 1, title: 'دورة تطوير الويب', category: 'تكنولوجيا' },
-    { id: 2, title: 'دورة الذكاء الاصطناعي', category: 'ذكاء اصطناعي' },
-    { id: 3, title: 'دورة التصميم الجرافيكي', category: 'تصميم' }
-  ];
+  const { toast } = useToast();
+  const hasFetchedCampaigns = useRef(false);
 
   const themeColors = {
     primary: '#008DCB',
@@ -34,10 +30,21 @@ const AdminAdsPage = () => {
   };
 
   useEffect(() => {
-    const loadCampaigns = () => {
+    const loadCampaigns = async () => {
       try {
-        const saved = JSON.parse(localStorage.getItem('campaigns') || '[]');
-        setCampaigns(saved);
+                if (hasFetchedCampaigns.current) return;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/campaigns?populate=*`);
+        const { data } = await response.json();
+        
+        const transformedCampaigns = data.map(campaign => ({
+          id: campaign.id,
+          ...campaign,
+          bannerImage: campaign.bannerImage?.data?.url || null,
+          course: campaign.course?.data || null
+        }));
+        
+        setCampaigns(transformedCampaigns);
         setIsLoading(false);
       } catch (error) {
         toast({
@@ -48,25 +55,58 @@ const AdminAdsPage = () => {
       }
     };
 
-    setTimeout(loadCampaigns, 1500);
+    loadCampaigns();
   }, [toast]);
 
-  const handleCreateCampaign = (newCampaign) => {
-    const updated = [...campaigns, { 
-      ...newCampaign,
-      id: Date.now(),
-      status: 'active',
-      stats: generateCampaignStats()
-    }];
-    
-    setCampaigns(updated);
-    localStorage.setItem('campaigns', JSON.stringify(updated));
-    
-    toast({
-      title: '🎉 تم إنشاء الحملة!',
-      description: 'تمت إضافة الحملة الجديدة بنجاح',
-      style: { backgroundColor: themeColors.primary + '20' }
-    });
+  const handleCreateCampaign = async (newCampaign) => {
+    try {
+      const formData = new FormData();
+      
+      // إضافة بيانات الحملة
+      formData.append('data', JSON.stringify({
+        title: newCampaign.title,
+        description: newCampaign.description,
+        budget: newCampaign.budget,
+        startDate: newCampaign.startDate,
+        endDate: newCampaign.endDate,
+        status: 'pending',
+        course: newCampaign.courseId
+      }));
+      
+      // إضافة ملف الصورة إذا وجد
+      if (newCampaign.bannerImageFile) {
+        formData.append('files.bannerImage', newCampaign.bannerImageFile);
+      }
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/campaigns`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const { data } = await response.json();
+      
+      // تحديث حالة الواجهة بالحملة الجديدة
+      const addedCampaign = {
+        id: data.id,
+        ...data.attributes,
+        bannerImage: data.attributes.bannerImage?.data?.attributes?.url || null,
+        stats: generateCampaignStats()
+      };
+      
+      setCampaigns(prev => [...prev, addedCampaign]);
+      
+      toast({
+        title: '🎉 تم إنشاء الحملة!',
+        description: 'تمت إضافة الحملة الجديدة بنجاح',
+        style: { backgroundColor: themeColors.primary + '20' }
+      });
+    } catch (error) {
+      toast({
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء إنشاء الحملة',
+        variant: 'destructive'
+      });
+    }
   };
 
   const generateCampaignStats = () => ({
@@ -105,6 +145,7 @@ const AdminAdsPage = () => {
   }
 
   return (
+    <ProtectedRoute>
     <div 
       className="container mx-auto p-6 space-y-8"
       style={{ backgroundColor: themeColors.background }}
@@ -158,7 +199,7 @@ const AdminAdsPage = () => {
         />
         <StatCard
           title="إجمالي الإنفاق"
-          value={`${campaigns.reduce((sum, c) => sum + c.budget, 0).toLocaleString()} ر.س`}
+          value={`${campaigns.reduce((sum, c) => sum + (c.budget || 0), 0).toLocaleString()} ر.س`}
           icon={<BarChart4 color={themeColors.accent} />}
           color={themeColors.accent}
         />
@@ -184,7 +225,6 @@ const AdminAdsPage = () => {
       <AdCampaignManager 
         ref={campaignFormRef}
         id="campaign-form"
-        courses={courses} 
         onCreateCampaign={handleCreateCampaign} 
         themeColors={themeColors}
       />
@@ -199,8 +239,8 @@ const AdminAdsPage = () => {
           <AdPerformanceChart 
             data={filteredCampaigns.map(c => ({
               date: c.startDate,
-              views: c.stats.views,
-              conversions: c.stats.conversions
+              views: c.stats?.views || 0,
+              conversions: c.stats?.conversions || 0
             }))}
             themeColors={themeColors}
           />
@@ -224,36 +264,9 @@ const AdminAdsPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      <Toast />
     </div>
+    </ProtectedRoute>
   );
 };
-
-const StatCard = ({ title, value, trend, icon, color }) => (
-  <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-    <div className="flex justify-between items-center">
-      <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-2xl font-bold" style={{ color }}>
-            {value}
-          </span>
-          {trend && (
-            <span 
-              className="text-sm"
-              style={{ color: trend.startsWith('+') ? '#008DCB' : '#E2101E' }}
-            >
-              {trend}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="p-2 rounded-lg" style={{ backgroundColor: color + '10' }}>
-        {icon}
-      </div>
-    </div>
-  </div>
-);
 
 export default AdminAdsPage;
