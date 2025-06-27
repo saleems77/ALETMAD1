@@ -16,6 +16,9 @@ export const CardHeader = ({ title, className }) => (
 export const CardContent = ({ children }) => (
   <div className="space-y-4">{children}</div>
 );
+export const CardFooter = ({ children }) => (
+  <div className="space-y-4">{children}</div>
+);
 
 export const CardTitle = ({ children }) => (
   <h2 className="text-xl font-bold mb-2">{children}</h2>
