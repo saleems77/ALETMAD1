@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import AdminAdsPage from './AdminAdsPage'
+import AdminAdsPage from './SocialMediaManager'
 import ProtectedRoute from '../DashBoardAdmin/components/ProtectedRoute';
 
 function page() {
