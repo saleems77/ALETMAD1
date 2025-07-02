@@ -1,14 +1,14 @@
-// ProtectedRoute.tsx
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDispatch ,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser, checkAuth } from '@/store/slices/authSlice';
 
 export default function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
   const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
   const router = useRouter();
-const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
+  const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
+
   useEffect(() => {
     const verifyAuth = async () => {
       const token = localStorage.getItem("jwt");
@@ -29,7 +29,10 @@ const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
         }
         
         const user = await res.json();
-        dispatch(setUser(user));
+        dispatch(setUser({
+          ...user,
+          documentId: user.id // إضافة documentId
+        }));
       } catch (error) {
         console.error("خطأ التحقق:", error);
         localStorage.removeItem("jwt");
@@ -38,7 +41,7 @@ const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
     };
 
     verifyAuth();
-  }, [dispatch, router]);
+  }, [dispatch, router, API_URL]);
 
   if (isLoading) {
     return <div>جاري التحقق...</div>;
