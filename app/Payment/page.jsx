@@ -1,27 +1,25 @@
-// app/payment/page.jsx
-"use client"
-import { useState, Suspense } from 'react';
-import PaymentMethodsList from '@/components/Payment/PaymentMethodsList';
-import PaymentHistoryTable from '@/components/Payment/PaymentHistoryTable';
-import PaymentGatewayModal from '@/components/Payment/PaymentGatewayModal';
+//app/payment/page.jsx
+"use client";
+import stripePromise from '../../lib/stripe';
 
-const PaymentPage = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">لوحة الدفع</h1>
-      <PaymentMethodsList />
-      <PaymentHistoryTable />
-      <button
-        onClick={() => setModalOpen(true)}
-        className="px-4 py-2 bg-green-600 text-white rounded-lg"
-      >
-        فتح بوابة الدفع
-      </button>
-      {isModalOpen && <PaymentGatewayModal amount={100} onClose={() => setModalOpen(false)} />}
-    </div>
-  );
+export default function PaymentButton({ items, userId }) {
+  const handlePayment = async () => {
+  const stripe = await stripePromise;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/payments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, userId })  // items: مصفوفة تحتوي على { name, price, quantity }
+  });
+  
+  const { sessionId } = await response.json();
+  await stripe.redirectToCheckout({ sessionId });  // تحويل المستخدم إلى Stripe Checkout
 };
-
-export default PaymentPage;
+  return (
+    <button 
+      onClick={handlePayment}
+      className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+    >
+      ادفع الآن
+    </button>
+  );
+}
