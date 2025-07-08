@@ -1,26 +1,37 @@
 "use client"
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-const NewTicketForm = ({ onClose, onSubmit }) => {
+const NewTicketForm = ({ onClose }) => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    user: '',
-    email: '',
-    type: 'فني',
-    priority: 'متوسط',
-    subject: '',
-    message: ''
+    content: "",
+    users_permissions_user: "" // سيتم ملؤه بـ documentId عند الحاجة
   });
 
-  const handleSubmit = () => {
-    onSubmit(formData);
-    setFormData({
-      user: '',
-      email: '',
-      type: 'فني',
-      priority: 'متوسط',
-      subject: '',
-      message: ''
-    });
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/support-tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("jwt")}`
+        },
+        body: JSON.stringify({
+          data: {
+            content: formData.content,
+            users_permissions_user: formData.users_permissions_user // استخدام documentId
+          }
+        })
+      });
+      if (!res.ok) throw new Error('فشل إنشاء التذكرة');
+      const data = await res.json();
+      dispatch(fetchAllTickets()); // تحديث قائمة التذاكر
+      onClose();
+    } catch (error) {
+      console.error('خطأ:', error);
+    }
   };
 
   return (
@@ -30,80 +41,27 @@ const NewTicketForm = ({ onClose, onSubmit }) => {
           <h3 className="text-xl font-bold">إنشاء تذكرة جديدة</h3>
           <button onClick={onClose} className="text-gray-500 text-2xl">×</button>
         </div>
-
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1">اسم المستخدم</label>
-              <input
-                type="text"
-                value={formData.user}
-                onChange={(e) => setFormData({...formData, user: e.target.value})}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1">البريد الإلكتروني</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1">نوع التذكرة</label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({...formData, type: e.target.value})}
-                className="w-full p-2 border rounded"
-              >
-                <option value="فني">فني</option>
-                <option value="مالي">مالي</option>
-                <option value="محتوى">محتوى</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-1">الأولوية</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                className="w-full p-2 border rounded"
-              >
-                <option value="عالي">عالي</option>
-                <option value="متوسط">متوسط</option>
-                <option value="منخفض">منخفض</option>
-              </select>
-            </div>
-          </div>
-
           <div>
-            <label className="block mb-1">الموضوع</label>
-            <input
-              type="text"
-              value={formData.subject}
-              onChange={(e) => setFormData({...formData, subject: e.target.value})}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">الرسالة</label>
+            <label className="block mb-1">محتوى التذكرة</label>
             <textarea
-              value={formData.message}
-              onChange={(e) => setFormData({...formData, message: e.target.value})}
+              value={formData.content}
+              onChange={(e) => setFormData({...formData, content: e.target.value})}
               className="w-full p-2 border rounded h-32"
               required
             />
           </div>
+          <div>
+            <label className="block mb-1">المستخدم (documentId)</label>
+            <input
+              type="text"
+              value={formData.users_permissions_user}
+              onChange={(e) => setFormData({...formData, users_permissions_user: e.target.value})}
+              className="w-full p-2 border rounded"
+              placeholder="أدخل documentId للمستخدم"
+            />
+          </div>
         </div>
-
         <div className="mt-6 flex justify-end space-x-3">
           <button
             type="button"

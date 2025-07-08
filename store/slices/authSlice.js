@@ -150,6 +150,56 @@ export const checkAuth = createAsyncThunk(
     }
   }
 );
+export const fetchUserTickets = createAsyncThunk(
+  "auth/fetchUserTickets",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token, user } = getState().auth;
+      const res = await axios.get(
+        `${API_URL}/support-tickets` +
+          `?filters[users_permissions_user][documentId][$eq]=${user.documentId}` +
+          `&populate=users_permissions_user`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+export const fetchAllTickets = createAsyncThunk(
+  "auth/fetchAllTickets",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const res = await axios.get(
+        `${API_URL}/support-tickets?populate=users_permissions_user`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// تحديث حالة التذكرة والإجابة الإدارية
+export const updateTicket = createAsyncThunk(
+  "auth/updateTicket",
+  async ({ documentId, updateData }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const res = await axios.put(
+        `${API_URL}/support-tickets/${documentId}`,
+        { data: updateData },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const initialState = {
   user: null,
@@ -158,6 +208,8 @@ const initialState = {
   isAuthenticated: false,
   isLoading: true,
   error: null,
+  allTickets: [], // تخزين جميع التذاكر
+  userTickets: [], // تخزين تذاكر المستخدم الحالي
 };
 
 const authSlice = createSlice({
@@ -235,6 +287,23 @@ const authSlice = createSlice({
       .addCase(checkAuth.rejected, (state) => {
         state.isLoading = false;
         state.isAuthenticated = false;
+      })
+      .addCase(fetchUserTickets.fulfilled, (state, action) => {
+        state.userTickets = action.payload.data;
+      })
+      .addCase(fetchUserTickets.rejected, (state, action) => {
+        console.error("فشل جلب الرسائل:", action.payload);
+      })
+      .addCase(fetchAllTickets.fulfilled, (state, action) => {
+        state.allTickets = action.payload; // تخزين جميع التذاكر
+      })
+      .addCase(updateTicket.fulfilled, (state, action) => {
+        const updatedTicket = action.payload;
+        state.allTickets = state.allTickets.map((ticket) =>
+          ticket.documentId === updatedTicket.documentId
+            ? updatedTicket
+            : ticket
+        );
       });
   },
 });

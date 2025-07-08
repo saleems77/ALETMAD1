@@ -17,6 +17,7 @@
         "@faker-js/faker": "^9.6.0",
         "@ffmpeg/ffmpeg": "^0.12.15",
         "@formkit/auto-animate": "^0.8.2",
+        "@fortawesome/fontawesome-svg-core": "^6.7.2",
         "@fortawesome/free-solid-svg-icons": "^6.7.2",
         "@fortawesome/react-fontawesome": "^0.2.2",
         "@google/genai": "^1.5.1",
@@ -61,7 +62,7 @@
         "@yudiel/react-qr-scanner": "^2.2.1",
         "antd": "^5.24.7",
         "autoprefixer": "^10.4.21",
-        "axios": "^1.9.0",
+        "axios": "^1.10.0",
         "chart.js": "^4.4.8",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -3255,7 +3256,6 @@
       "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.7.2.tgz",
       "integrity": "sha512-yxtOBWDrdi5DD5o1pmVdq3WMCvnobT0LU6R8RyyVXPvFRd2o79/0NCuQoCjNTeZz9EzA9xS3JxNWfv54RIHFEA==",
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "@fortawesome/fontawesome-common-types": "6.7.2"
       },
@@ -13314,9 +13314,9 @@
       }
     },
     "node_modules/axios": {
-      "version": "1.9.0",
-      "resolved": "https://registry.npmjs.org/axios/-/axios-1.9.0.tgz",
-      "integrity": "sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==",
+      "version": "1.10.0",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.10.0.tgz",
+      "integrity": "sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==",
       "license": "MIT",
       "dependencies": {
         "follow-redirects": "^1.15.6",
