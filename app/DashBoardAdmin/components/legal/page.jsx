@@ -1,8 +1,15 @@
 // app/DashBoaredAdmin/components/legal/page.jsx
-import PrivacyPolicy from './PrivacyPolicy'; // عادي، بدون dynamic ولا ssr: false
 
+import PolicyManager from "./PolicyManager";
 
 
 export default function PrivacyPage() {
-  return <PrivacyPolicy />;
+  return(  
+  
+     <div>
+      <h1>سياسة الخصوصية</h1>
+      <PolicyManager />
+    </div>
+)
+  ;
 }
