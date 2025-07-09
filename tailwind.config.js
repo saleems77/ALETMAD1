@@ -25,7 +25,22 @@ module.exports = {
         gray: "#999999",
         red: "#E2101E",
         yellow: "#F9D011",
-        ring: "var(--ring)", // تأكد من وجود هذا التعريف
+        ring: "var(--ring)",
+        primary: {
+          600: "#008DCB",
+        },
+        secondary: {
+          500: "#0D1012",
+        },
+        gray: {
+          500: "#999999",
+        },
+        danger: {
+          500: "#E2101E",
+        },
+        warning: {
+          500: "#F9D011",
+        }, // تأكد من وجود هذا التعريف
 
         border: "var(--border)",
         ring: "var(--ring)",

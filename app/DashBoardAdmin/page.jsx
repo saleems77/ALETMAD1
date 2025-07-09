@@ -35,7 +35,7 @@ import CommunityCoursePage from './components/communitycourse/page';
 import ReportsDashboard from './components/Reports/page';
 
 import TicketsManager from './components/Support/TicketsManager';
-import TasksManager from './components/Support/TasksManager';
+import TasksPage from './components/Support/page';
 import InternalCommunication from './components/voip/InternalCommunication';
 import VoipDashboard from './components/voip/page';
 import UsersPage from '../DashBoardHR/components/managmentTeam/page';
@@ -252,9 +252,9 @@ const AdminDashboard = () => {
                 {activeSection === 'saas' && <LicenseDashboard   />}
                 {activeSection === 'social' && <SosialDashboard   />}
                 {activeSection === 'report' && <ReportsDashboard />}
-{activeSection === 'support' && (
+{activeSection === 'tasks' && (
                       <div className="bg-white p-6 rounded-lg shadow-sm">
-                    {activeSection === 'support' && <TasksManager />}
+                    {activeSection === 'tasks' && <TasksPage />}
                     </div>
                     )}
                     {activeSection === 'finance' && (

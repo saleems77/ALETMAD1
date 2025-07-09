@@ -53,6 +53,7 @@ const categories = [
     icon: faHeadset,
     items: [
       { key: 'support', label: 'الدعم والتذاكر', icon: faHeadset },
+      { key: 'tasks', label: 'مهمات المستخدمين ', icon: faHeadset },
       { key: 'email', label: 'إدارة النظام البريدي', icon: faEnvelope },
       { key: 'crm', label: 'CRM', icon: faComments },
       { key: 'saas', label: 'ادارة التراخيص SaaS', icon: faFileAlt },
